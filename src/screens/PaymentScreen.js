@@ -11,9 +11,11 @@ import {
   Animated,
   Dimensions,
   Modal,
+  Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import bonusStorage from '../data/BonusStorage';
 
 const { width, height } = Dimensions.get('window');
 
@@ -22,6 +24,9 @@ export default function PaymentScreen({ navigation, route }) {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('card');
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [useBonuses, setUseBonuses] = useState(false);
+  const [bonusToSpend, setBonusToSpend] = useState(0);
+  const [bonusBalance, setBonusBalance] = useState(bonusStorage.getBalance());
 
   // Animation refs
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -85,6 +90,10 @@ export default function PaymentScreen({ navigation, route }) {
     ]).start();
   }, []);
 
+  useEffect(() => {
+    setBonusBalance(bonusStorage.getBalance());
+  }, [showSuccessModal]);
+
   const startSuccessAnimation = () => {
     setShowSuccessModal(true);
     
@@ -127,6 +136,9 @@ export default function PaymentScreen({ navigation, route }) {
     ]).start();
   };
 
+  // Итоговая сумма с учетом бонусов
+  const totalToPay = Math.max(0, bookingData.total - (useBonuses ? bonusToSpend : 0));
+
   const handlePayment = async () => {
     setIsProcessing(true);
 
@@ -134,6 +146,17 @@ export default function PaymentScreen({ navigation, route }) {
       // Симуляция обработки платежа
       await new Promise(resolve => setTimeout(resolve, 3000));
       
+      // Списываем бонусы, если выбрано
+      let spentBonuses = 0;
+      if (useBonuses && bonusToSpend > 0) {
+        spentBonuses = Math.min(bonusToSpend, bonusStorage.getBalance(), bookingData.total);
+        bonusStorage.spend(spentBonuses, 'Списание при оплате брони');
+      }
+      // Начисляем 10% от реально оплаченной суммы
+      const earned = Math.round(totalToPay * 0.10);
+      if (earned > 0) {
+        bonusStorage.add(earned, 'Начисление за оплату брони');
+      }
       setIsProcessing(false);
       startSuccessAnimation();
       
@@ -161,29 +184,31 @@ export default function PaymentScreen({ navigation, route }) {
   };
 
   const renderHeader = () => (
-    <Animated.View style={[styles.headerContainer, { 
-      opacity: fadeAnim,
-      transform: [{ translateY: slideAnim }]
-    }]}>
-      <LinearGradient
-        colors={['#667eea', '#764ba2']}
-        style={styles.header}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      >
-        <View style={styles.headerContent}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Ionicons name="arrow-back" size={24} color="white" />
-          </TouchableOpacity>
-          
-          <Text style={styles.headerTitle}>Оплата билетов</Text>
-          <View style={styles.headerPlaceholder} />
-        </View>
-      </LinearGradient>
-    </Animated.View>
+    <SafeAreaView style={styles.headerSafeArea}>
+      <Animated.View style={[styles.headerContainer, { 
+        opacity: fadeAnim,
+        transform: [{ translateY: slideAnim }]
+      }]}>
+        <LinearGradient
+          colors={['#667eea', '#764ba2']}
+          style={styles.header}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        >
+          <View style={styles.headerContent}>
+            <TouchableOpacity 
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
+            >
+              <Ionicons name="arrow-back" size={24} color="white" />
+            </TouchableOpacity>
+            
+            <Text style={styles.headerTitle}>Оплата билетов</Text>
+            <View style={styles.headerPlaceholder} />
+          </View>
+        </LinearGradient>
+      </Animated.View>
+    </SafeAreaView>
   );
 
   const renderBookingSummary = () => (
@@ -216,7 +241,7 @@ export default function PaymentScreen({ navigation, route }) {
           <View style={styles.totalRow}>
             <Text style={styles.totalLabel}>Итого к оплате:</Text>
             <Text style={styles.totalValue}>
-              {bookingData?.total?.toLocaleString('ru-RU')} ₸
+              {totalToPay.toLocaleString('ru-RU')} ₸
             </Text>
           </View>
         </View>
@@ -224,9 +249,38 @@ export default function PaymentScreen({ navigation, route }) {
     </Animated.View>
   );
 
+  const renderBonusBlock = () => (
+    <View style={styles.bonusBlock}>
+      <View style={styles.bonusHeader}>
+        <Ionicons name="diamond" size={22} color="#FFD700" style={{ marginRight: 8 }} />
+        <Text style={styles.bonusTitle}>Бонусы</Text>
+        <Text style={styles.bonusBalance}>{bonusBalance} бонусов</Text>
+      </View>
+      <View style={styles.bonusRow}>
+        <TouchableOpacity
+          style={[styles.bonusCheckbox, useBonuses && styles.bonusCheckboxActive]}
+          onPress={() => setUseBonuses(!useBonuses)}
+        >
+          {useBonuses && <Ionicons name="checkmark" size={18} color="#667eea" />}
+        </TouchableOpacity>
+        <Text style={styles.bonusLabel}>Использовать бонусы для оплаты</Text>
+        {useBonuses && (
+          <View style={styles.bonusInputWrap}>
+            <TouchableOpacity onPress={() => setBonusToSpend(Math.max(0, bonusToSpend - 50))} style={styles.bonusInputBtn}><Text style={styles.bonusInputBtnText}>-</Text></TouchableOpacity>
+            <Text style={styles.bonusInput}>{bonusToSpend}</Text>
+            <TouchableOpacity onPress={() => setBonusToSpend(Math.min(bonusBalance, bookingData.total, bonusToSpend + 50))} style={styles.bonusInputBtn}><Text style={styles.bonusInputBtnText}>+</Text></TouchableOpacity>
+          </View>
+        )}
+      </View>
+      {useBonuses && <Text style={styles.bonusHint}>Максимум: {Math.min(bonusBalance, bookingData.total)} бонусов</Text>}
+    </View>
+  );
+
   const renderPaymentMethods = () => (
     <Animated.View style={[styles.paymentContainer, { opacity: fadeAnim }]}>
       <Text style={styles.sectionTitle}>Способ оплаты</Text>
+      
+      {renderBonusBlock()}
       
       {paymentMethods.map((method, index) => (
         <Animated.View
@@ -321,7 +375,7 @@ export default function PaymentScreen({ navigation, route }) {
             <Ionicons name="card" size={24} color="white" />
           )}
           <Text style={styles.payButtonText}>
-            {isProcessing ? 'Обработка платежа...' : `Оплатить ${bookingData?.total?.toLocaleString('ru-RU')} ₸`}
+            {isProcessing ? 'Обработка платежа...' : `Оплатить ${totalToPay.toLocaleString('ru-RU')} ₸`}
           </Text>
         </LinearGradient>
       </TouchableOpacity>
@@ -474,11 +528,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f8fafc',
   },
+  headerSafeArea: {
+    backgroundColor: '#667eea',
+  },
   headerContainer: {
     marginBottom: 20,
   },
   header: {
-    paddingTop: 20,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight || 32 : 24,
     paddingBottom: 25,
     paddingHorizontal: 20,
   },
@@ -569,7 +626,7 @@ const styles = StyleSheet.create({
     color: '#1a202c',
   },
   totalValue: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#4CAF50',
   },
@@ -763,5 +820,73 @@ const styles = StyleSheet.create({
   successContent: {
     alignItems: 'center',
     zIndex: 3,
+  },
+  bonusBlock: {
+    marginBottom: 20,
+  },
+  bonusHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  bonusTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1a202c',
+  },
+  bonusBalance: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#4CAF50',
+  },
+  bonusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  bonusCheckbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#4CAF50',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  bonusCheckboxActive: {
+    backgroundColor: '#4CAF50',
+  },
+  bonusLabel: {
+    fontSize: 16,
+    color: '#1a202c',
+  },
+  bonusInputWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#4CAF50',
+    borderRadius: 12,
+    padding: 5,
+  },
+  bonusInputBtn: {
+    width: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  bonusInputBtnText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#4CAF50',
+  },
+  bonusInput: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1a202c',
+    marginHorizontal: 10,
+  },
+  bonusHint: {
+    fontSize: 14,
+    color: '#718096',
   },
 }); 
