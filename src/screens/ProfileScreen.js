@@ -452,7 +452,7 @@ export default function ProfileScreen({ navigation, route }) {
 
   // Быстрое действие: Бонусы
   const handleBonusPress = () => {
-    setBonusModalVisible(true);
+    navigation.navigate('Bonus');
   };
 
   // Быстрое действие: Пригласить
@@ -468,7 +468,7 @@ export default function ProfileScreen({ navigation, route }) {
 
   // Быстрое действие: Поддержка
   const handleSupportPress = () => {
-    setSupportModalVisible(true);
+    navigation.navigate('Support');
   };
 
   // Сохранить настройки
@@ -529,25 +529,6 @@ export default function ProfileScreen({ navigation, route }) {
             <Text style={{ color:'#666', textAlign:'center', marginBottom:18 }}>Ваша бонусная программа скоро будет доступна. Следите за обновлениями!</Text>
             <TouchableOpacity onPress={()=>setBonusModalVisible(false)} style={{ marginTop:8 }}>
               <Text style={{ color:'#667eea', fontWeight:'bold', fontSize:16 }}>ОК</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-      {/* Модалка поддержки */}
-      <Modal visible={supportModalVisible} transparent animationType="fade">
-        <View style={{ flex:1, backgroundColor:'rgba(0,0,0,0.3)', justifyContent:'center', alignItems:'center' }}>
-          <View style={{ backgroundColor:'white', borderRadius:16, padding:28, alignItems:'center', width:300 }}>
-            <Ionicons name="help-circle-outline" size={40} color="#fcb69f" style={{ marginBottom: 12 }} />
-            <Text style={{ fontSize:18, fontWeight:'bold', marginBottom:8 }}>Поддержка</Text>
-            <Text style={{ color:'#666', textAlign:'center', marginBottom:18 }}>Пишите нам на support@sportmobile.kz или звоните +7 777 123 45 67</Text>
-            <TouchableOpacity onPress={()=>{
-              Linking.openURL('mailto:support@sportmobile.kz');
-              setSupportModalVisible(false);
-            }} style={{ marginBottom:8 }}>
-              <Text style={{ color:'#667eea', fontWeight:'bold', fontSize:16 }}>Написать на почту</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={()=>setSupportModalVisible(false)}>
-              <Text style={{ color:'#667eea', fontWeight:'bold', fontSize:16 }}>Закрыть</Text>
             </TouchableOpacity>
           </View>
         </View>

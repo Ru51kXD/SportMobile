@@ -15,6 +15,8 @@ import CreateEventScreen from './src/screens/CreateEventScreen';
 import SeatSelectionScreen from './src/screens/SeatSelectionScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import PaymentScreen from './src/screens/PaymentScreen';
+import SupportScreen from './src/screens/SupportScreen';
+import BonusScreen from './src/screens/BonusScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -99,6 +101,8 @@ export default function App() {
         <Stack.Screen name="Payment" component={PaymentScreen} />
         <Stack.Screen name="Stats" component={StatsScreen} />
         <Stack.Screen name="Favorites" component={FavoritesScreen} />
+        <Stack.Screen name="Support" component={SupportScreen} />
+        <Stack.Screen name="Bonus" component={BonusScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
