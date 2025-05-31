@@ -11,9 +11,17 @@ import {
   Dimensions,
   Animated,
   StatusBar,
+  Share,
+  Modal,
+  Linking,
+  Alert,
+  TextInput,
+  Switch,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { worldEvents } from '../data/WorldEvents';
+import { favoriteStorage } from '../data/FavoriteStorage';
 
 const { width, height } = Dimensions.get('window');
 
@@ -71,6 +79,14 @@ export default function ProfileScreen({ navigation, route }) {
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
   const rotateAnim = useRef(new Animated.Value(0)).current;
   const newBookingAnim = useRef(new Animated.Value(0)).current;
+
+  const [bonusModalVisible, setBonusModalVisible] = useState(false);
+  const [supportModalVisible, setSupportModalVisible] = useState(false);
+  const [settingsModalVisible, setSettingsModalVisible] = useState(false);
+  const [settingsName, setSettingsName] = useState('ForWinkk');
+  const [settingsEmail, setSettingsEmail] = useState('user@example.com');
+  const [settingsLang, setSettingsLang] = useState('ru');
+  const [settingsNotifications, setSettingsNotifications] = useState(true);
 
   useEffect(() => {
     // Проверяем новое бронирование из навигации
@@ -169,48 +185,96 @@ export default function ProfileScreen({ navigation, route }) {
   };
 
   const renderHeader = () => (
-    <Animated.View style={[styles.headerContainer, { 
-      opacity: fadeAnim,
-      transform: [{ translateY: slideAnim }]
-    }]}>
-      <LinearGradient
-        colors={['#667eea', '#764ba2']}
-        style={styles.header}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      >
-        <View style={styles.headerContent}>
-          <View style={styles.profileInfo}>
-            <Animated.View style={[styles.avatarContainer, { transform: [{ scale: scaleAnim }] }]}>
-              <LinearGradient
-                colors={['#FFD700', '#FFA500']}
-                style={styles.avatar}
-              >
-                <Ionicons name="person" size={40} color="white" />
-              </LinearGradient>
-              <View style={styles.levelBadge}>
-                <Text style={styles.levelText}>⭐</Text>
-              </View>
-            </Animated.View>
-            
-            <View style={styles.userInfo}>
-              <Text style={styles.userName}>ForWinkk</Text>
-              <Text style={styles.userLevel}>{userStats.level}</Text>
-              <View style={styles.pointsContainer}>
-                <Ionicons name="diamond" size={16} color="#FFD700" />
-                <Text style={styles.points}>{userStats.points} очков</Text>
+    <SafeAreaView style={styles.headerSafeArea}>
+      <Animated.View style={[styles.headerContainer, { 
+        opacity: fadeAnim,
+        transform: [{ translateY: slideAnim }]
+      }]}>
+        <LinearGradient
+          colors={['#667eea', '#764ba2']}
+          style={styles.header}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        >
+          <View style={styles.headerContent}>
+            <View style={styles.profileInfo}>
+              <Animated.View style={[styles.avatarContainer, { transform: [{ scale: scaleAnim }] }]}>
+                <LinearGradient
+                  colors={['#FFD700', '#FFA500']}
+                  style={styles.avatar}
+                >
+                  <Ionicons name="person" size={40} color="white" />
+                </LinearGradient>
+                <View style={styles.levelBadge}>
+                  <Text style={styles.levelText}>⭐</Text>
+                </View>
+              </Animated.View>
+              
+              <View style={styles.userInfo}>
+                <Text style={styles.userName}>{userStats.userName}</Text>
+                <Text style={styles.userLevel}>{userStats.level}</Text>
+                <View style={styles.pointsContainer}>
+                  <Ionicons name="diamond" size={16} color="#FFD700" />
+                  <Text style={styles.points}>{userStats.points} очков</Text>
+                </View>
               </View>
             </View>
+            
+            <TouchableOpacity style={styles.settingsButton} onPress={() => setSettingsModalVisible(true)}>
+              <Animated.View style={{ transform: [{ rotate: spin }] }}>
+                <Ionicons name="settings" size={24} color="white" />
+              </Animated.View>
+            </TouchableOpacity>
           </View>
-          
-          <TouchableOpacity style={styles.settingsButton}>
-            <Animated.View style={{ transform: [{ rotate: spin }] }}>
-              <Ionicons name="settings" size={24} color="white" />
-            </Animated.View>
-          </TouchableOpacity>
+        </LinearGradient>
+      </Animated.View>
+      {/* Settings Modal */}
+      <Modal visible={settingsModalVisible} transparent animationType="fade">
+        <View style={{ flex:1, backgroundColor:'rgba(0,0,0,0.3)', justifyContent:'center', alignItems:'center' }}>
+          <View style={{ backgroundColor:'white', borderRadius:16, padding:28, alignItems:'stretch', width:320 }}>
+            <Ionicons name="settings-outline" size={40} color="#667eea" style={{ alignSelf:'center', marginBottom: 12 }} />
+            <Text style={{ fontSize:20, fontWeight:'bold', marginBottom:16, alignSelf:'center' }}>Настройки</Text>
+            <Text style={{ color:'#1a202c', fontWeight:'600', marginBottom:4 }}>Имя</Text>
+            <TextInput
+              style={{ borderWidth:1, borderColor:'#e0e0e0', borderRadius:10, padding:10, marginBottom:12, fontSize:16 }}
+              value={settingsName}
+              onChangeText={setSettingsName}
+              placeholder="Ваше имя"
+            />
+            <Text style={{ color:'#1a202c', fontWeight:'600', marginBottom:4 }}>Email</Text>
+            <TextInput
+              style={{ borderWidth:1, borderColor:'#e0e0e0', borderRadius:10, padding:10, marginBottom:12, fontSize:16 }}
+              value={settingsEmail}
+              onChangeText={setSettingsEmail}
+              placeholder="Ваш email"
+              keyboardType="email-address"
+            />
+            <Text style={{ color:'#1a202c', fontWeight:'600', marginBottom:4 }}>Язык</Text>
+            <View style={{ flexDirection:'row', marginBottom:12 }}>
+              <TouchableOpacity onPress={()=>setSettingsLang('ru')} style={{ backgroundColor: settingsLang==='ru' ? '#667eea' : '#f0f0f0', borderRadius:8, paddingVertical:6, paddingHorizontal:16, marginRight:8 }}>
+                <Text style={{ color: settingsLang==='ru' ? 'white' : '#1a202c', fontWeight:'600' }}>Русский</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={()=>setSettingsLang('en')} style={{ backgroundColor: settingsLang==='en' ? '#667eea' : '#f0f0f0', borderRadius:8, paddingVertical:6, paddingHorizontal:16 }}>
+                <Text style={{ color: settingsLang==='en' ? 'white' : '#1a202c', fontWeight:'600' }}>English</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{ flexDirection:'row', alignItems:'center', marginBottom:16 }}>
+              <Text style={{ color:'#1a202c', fontWeight:'600', flex:1 }}>Уведомления</Text>
+              <Switch value={settingsNotifications} onValueChange={setSettingsNotifications} />
+            </View>
+            <TouchableOpacity onPress={handleSaveSettings} style={{ backgroundColor:'#667eea', borderRadius:10, paddingVertical:12, alignItems:'center', marginBottom:12 }}>
+              <Text style={{ color:'white', fontWeight:'bold', fontSize:16 }}>Сохранить</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleLogout} style={{ alignItems:'center', marginBottom:4 }}>
+              <Text style={{ color:'#f44336', fontWeight:'bold', fontSize:16 }}>Выйти из аккаунта</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=>setSettingsModalVisible(false)} style={{ alignItems:'center', marginTop:8 }}>
+              <Text style={{ color:'#667eea', fontWeight:'bold', fontSize:16 }}>Отмена</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </LinearGradient>
-    </Animated.View>
+      </Modal>
+    </SafeAreaView>
   );
 
   const renderStats = () => (
@@ -381,51 +445,113 @@ export default function ProfileScreen({ navigation, route }) {
     </Animated.View>
   );
 
+  // Быстрое действие: Избранное
+  const handleFavoritesPress = () => {
+    navigation.navigate('Favorites', { favoriteIds: favoriteStorage.getFavorites() });
+  };
+
+  // Быстрое действие: Бонусы
+  const handleBonusPress = () => {
+    setBonusModalVisible(true);
+  };
+
+  // Быстрое действие: Пригласить
+  const handleInvitePress = async () => {
+    try {
+      await Share.share({
+        message: 'Присоединяйся к лучшему спортивному приложению! SportMobile ⚡️',
+      });
+    } catch (error) {
+      Alert.alert('Ошибка', 'Не удалось открыть диалог приглашения');
+    }
+  };
+
+  // Быстрое действие: Поддержка
+  const handleSupportPress = () => {
+    setSupportModalVisible(true);
+  };
+
+  // Сохранить настройки
+  const handleSaveSettings = () => {
+    // Можно добавить валидацию email/имени
+    setUserStats(prev => ({ ...prev, userName: settingsName }));
+    setSettingsModalVisible(false);
+    Alert.alert('Сохранено', 'Настройки успешно сохранены!');
+  };
+
+  // Выйти из аккаунта
+  const handleLogout = () => {
+    setSettingsModalVisible(false);
+    Alert.alert('Выход', 'Вы вышли из аккаунта!');
+    // Здесь можно добавить логику выхода
+  };
+
   const renderQuickActions = () => (
     <Animated.View style={[styles.quickActionsContainer, { opacity: fadeAnim }]}>
       <Text style={styles.sectionTitle}>⚡ Быстрые действия</Text>
       
       <View style={styles.actionsGrid}>
-        <TouchableOpacity style={styles.actionButton}>
-          <LinearGradient
-            colors={['#667eea', '#764ba2']}
-            style={styles.actionGradient}
-          >
+        <TouchableOpacity style={styles.actionButton} onPress={handleFavoritesPress}>
+          <LinearGradient colors={['#667eea', '#764ba2']} style={styles.actionGradient}>
             <Ionicons name="heart-outline" size={24} color="white" />
             <Text style={styles.actionText}>Избранное</Text>
           </LinearGradient>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionButton}>
-          <LinearGradient
-            colors={['#f093fb', '#f5576c']}
-            style={styles.actionGradient}
-          >
+        <TouchableOpacity style={styles.actionButton} onPress={handleBonusPress}>
+          <LinearGradient colors={['#f093fb', '#f5576c']} style={styles.actionGradient}>
             <Ionicons name="gift-outline" size={24} color="white" />
             <Text style={styles.actionText}>Бонусы</Text>
           </LinearGradient>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionButton}>
-          <LinearGradient
-            colors={['#4ecdc4', '#44a08d']}
-            style={styles.actionGradient}
-          >
+        <TouchableOpacity style={styles.actionButton} onPress={handleInvitePress}>
+          <LinearGradient colors={['#4ecdc4', '#44a08d']} style={styles.actionGradient}>
             <Ionicons name="share-outline" size={24} color="white" />
             <Text style={styles.actionText}>Пригласить</Text>
           </LinearGradient>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionButton}>
-          <LinearGradient
-            colors={['#ffecd2', '#fcb69f']}
-            style={styles.actionGradient}
-          >
+        <TouchableOpacity style={styles.actionButton} onPress={handleSupportPress}>
+          <LinearGradient colors={['#ffecd2', '#fcb69f']} style={styles.actionGradient}>
             <Ionicons name="help-circle-outline" size={24} color="white" />
             <Text style={styles.actionText}>Поддержка</Text>
           </LinearGradient>
         </TouchableOpacity>
       </View>
+
+      {/* Модалка бонусов */}
+      <Modal visible={bonusModalVisible} transparent animationType="fade">
+        <View style={{ flex:1, backgroundColor:'rgba(0,0,0,0.3)', justifyContent:'center', alignItems:'center' }}>
+          <View style={{ backgroundColor:'white', borderRadius:16, padding:28, alignItems:'center', width:300 }}>
+            <Ionicons name="gift-outline" size={40} color="#f093fb" style={{ marginBottom: 12 }} />
+            <Text style={{ fontSize:18, fontWeight:'bold', marginBottom:8 }}>Бонусы скоро!</Text>
+            <Text style={{ color:'#666', textAlign:'center', marginBottom:18 }}>Ваша бонусная программа скоро будет доступна. Следите за обновлениями!</Text>
+            <TouchableOpacity onPress={()=>setBonusModalVisible(false)} style={{ marginTop:8 }}>
+              <Text style={{ color:'#667eea', fontWeight:'bold', fontSize:16 }}>ОК</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+      {/* Модалка поддержки */}
+      <Modal visible={supportModalVisible} transparent animationType="fade">
+        <View style={{ flex:1, backgroundColor:'rgba(0,0,0,0.3)', justifyContent:'center', alignItems:'center' }}>
+          <View style={{ backgroundColor:'white', borderRadius:16, padding:28, alignItems:'center', width:300 }}>
+            <Ionicons name="help-circle-outline" size={40} color="#fcb69f" style={{ marginBottom: 12 }} />
+            <Text style={{ fontSize:18, fontWeight:'bold', marginBottom:8 }}>Поддержка</Text>
+            <Text style={{ color:'#666', textAlign:'center', marginBottom:18 }}>Пишите нам на support@sportmobile.kz или звоните +7 777 123 45 67</Text>
+            <TouchableOpacity onPress={()=>{
+              Linking.openURL('mailto:support@sportmobile.kz');
+              setSupportModalVisible(false);
+            }} style={{ marginBottom:8 }}>
+              <Text style={{ color:'#667eea', fontWeight:'bold', fontSize:16 }}>Написать на почту</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=>setSupportModalVisible(false)}>
+              <Text style={{ color:'#667eea', fontWeight:'bold', fontSize:16 }}>Закрыть</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </Animated.View>
   );
 
@@ -460,11 +586,14 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 100,
   },
+  headerSafeArea: {
+    backgroundColor: '#667eea',
+  },
   headerContainer: {
     marginBottom: 25,
   },
   header: {
-    paddingTop: 20,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight || 32 : 24,
     paddingBottom: 30,
     paddingHorizontal: 20,
   },

@@ -9,6 +9,7 @@ import {
   Alert,
   Platform,
   Dimensions,
+  StatusBar,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -445,7 +446,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingTop: Platform.OS === 'ios' ? 0 : 25,
+    paddingTop: Platform.OS === 'ios' ? 44 : (StatusBar.currentHeight ? StatusBar.currentHeight + 10 : 34),
     paddingBottom: 15,
   },
   backButton: {

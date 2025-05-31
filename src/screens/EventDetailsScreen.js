@@ -12,30 +12,17 @@ import {
   Modal,
   Dimensions,
   Animated,
+  Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { favoriteStorage } from '../data/FavoriteStorage';
 
 const { width, height } = Dimensions.get('window');
 
-// Простое хранилище данных
+// Простое хранилище данных только для отзывов
 const storage = {
-  favorites: [],
   reviews: [],
-  
-  addToFavorites: (eventId) => {
-    if (!storage.favorites.includes(eventId)) {
-      storage.favorites.push(eventId);
-    }
-  },
-  
-  removeFromFavorites: (eventId) => {
-    storage.favorites = storage.favorites.filter(id => id !== eventId);
-  },
-  
-  isFavorite: (eventId) => {
-    return storage.favorites.includes(eventId);
-  },
   
   addReview: (eventId, userName, rating, comment) => {
     const review = {
@@ -100,7 +87,7 @@ const EventDetailsScreen = ({ route, navigation }) => {
   }, []);
 
   const checkIfFavorite = () => {
-    setIsFavorite(storage.isFavorite(event.id));
+    setIsFavorite(favoriteStorage.isFavorite(event.id));
   };
 
   const loadReviews = () => {
@@ -124,10 +111,10 @@ const EventDetailsScreen = ({ route, navigation }) => {
     ]).start();
 
     if (isFavorite) {
-      storage.removeFromFavorites(event.id);
+      favoriteStorage.removeFavorite(event.id);
       setIsFavorite(false);
     } else {
-      storage.addToFavorites(event.id);
+      favoriteStorage.addFavorite(event.id);
       setIsFavorite(true);
     }
   };
@@ -398,9 +385,7 @@ const EventDetailsScreen = ({ route, navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
-      
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Hero Image */}
+      <SafeAreaView style={styles.headerSafeArea}>
         <Animated.View style={[styles.heroContainer, { opacity: fadeAnim }]}>
           <LinearGradient
             colors={[event.sport_color || '#667eea', event.sport_color + '80' || '#764ba2']}
@@ -411,7 +396,6 @@ const EventDetailsScreen = ({ route, navigation }) => {
               <Text style={styles.heroTitle}>{event.title}</Text>
             </View>
           </LinearGradient>
-          
           {/* Header Overlay */}
           <View style={styles.header}>
             <TouchableOpacity
@@ -420,7 +404,6 @@ const EventDetailsScreen = ({ route, navigation }) => {
             >
               <Ionicons name="arrow-back" size={24} color="white" />
             </TouchableOpacity>
-            
             <Animated.View style={{ transform: [{ scale: heartAnim }] }}>
               <TouchableOpacity
                 style={styles.favoriteButton}
@@ -435,122 +418,121 @@ const EventDetailsScreen = ({ route, navigation }) => {
             </Animated.View>
           </View>
         </Animated.View>
-
-        {/* Content */}
-        <Animated.View style={[styles.content, {
-          opacity: fadeAnim,
-          transform: [{ translateY: slideAnim }]
-        }]}>
-          {/* Title and Rating */}
-          <View style={styles.titleSection}>
-            <Text style={styles.title}>{event.title}</Text>
-            
-            {event.rating > 0 && (
-              <View style={styles.ratingContainer}>
-                <View style={styles.stars}>
-                  {getRatingStars(event.rating)}
-                </View>
-                <Text style={styles.ratingText}>
-                  {event.rating.toFixed(1)} ({event.reviews_count} отзывов)
-                </Text>
+      </SafeAreaView>
+      {/* Content */}
+      <Animated.View style={[styles.content, {
+        opacity: fadeAnim,
+        transform: [{ translateY: slideAnim }]
+      }]}>
+        {/* Title and Rating */}
+        <View style={styles.titleSection}>
+          <Text style={styles.title}>{event.title}</Text>
+          
+          {event.rating > 0 && (
+            <View style={styles.ratingContainer}>
+              <View style={styles.stars}>
+                {getRatingStars(event.rating)}
               </View>
-            )}
-          </View>
-
-          {/* Sport Badge */}
-          <View style={[styles.sportBadge, { backgroundColor: event.sport_color + '20' }]}>
-            <Text style={[styles.sportText, { color: event.sport_color }]}>
-              {event.sport_name}
-            </Text>
-          </View>
-
-          {/* Event Info */}
-          <View style={styles.infoSection}>
-            <View style={styles.infoItem}>
-              <Ionicons name="calendar" size={20} color="#667eea" />
-              <View style={styles.infoText}>
-                <Text style={styles.infoLabel}>Дата и время</Text>
-                <Text style={styles.infoValue}>
-                  {formatDate(event.date)} в {formatTime(event.time)}
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.infoItem}>
-              <Ionicons name="location" size={20} color="#667eea" />
-              <View style={styles.infoText}>
-                <Text style={styles.infoLabel}>Место проведения</Text>
-                <Text style={styles.infoValue}>{event.venue || event.location}</Text>
-              </View>
-            </View>
-
-            <View style={styles.infoItem}>
-              <Ionicons name="ticket" size={20} color="#667eea" />
-              <View style={styles.infoText}>
-                <Text style={styles.infoLabel}>Доступно билетов</Text>
-                <Text style={[
-                  styles.infoValue,
-                  { color: event.available_tickets > 0 ? '#4CAF50' : '#f44336' }
-                ]}>
-                  {event.available_tickets} из {event.capacity}
-                </Text>
-              </View>
-            </View>
-          </View>
-
-          {/* Description */}
-          {event.description && (
-            <View style={styles.descriptionSection}>
-              <Text style={styles.sectionTitle}>Описание</Text>
-              <Text style={styles.description}>{event.description}</Text>
+              <Text style={styles.ratingText}>
+                {event.rating.toFixed(1)} ({event.reviews_count} отзывов)
+              </Text>
             </View>
           )}
+        </View>
 
-          {/* Capacity Progress */}
-          <View style={styles.capacitySection}>
-            <Text style={styles.sectionTitle}>Заполненность</Text>
-            <View style={styles.capacityBar}>
-              <View
-                style={[
-                  styles.capacityFill,
-                  { 
-                    width: `${getCapacityPercentage()}%`,
-                    backgroundColor: getCapacityPercentage() > 90 ? '#f44336' : 
-                                   getCapacityPercentage() > 70 ? '#FFD700' : '#4CAF50'
-                  }
-                ]}
-              />
+        {/* Sport Badge */}
+        <View style={[styles.sportBadge, { backgroundColor: event.sport_color + '20' }]}>
+          <Text style={[styles.sportText, { color: event.sport_color }]}>
+            {event.sport_name}
+          </Text>
+        </View>
+
+        {/* Event Info */}
+        <View style={styles.infoSection}>
+          <View style={styles.infoItem}>
+            <Ionicons name="calendar" size={20} color="#667eea" />
+            <View style={styles.infoText}>
+              <Text style={styles.infoLabel}>Дата и время</Text>
+              <Text style={styles.infoValue}>
+                {formatDate(event.date)} в {formatTime(event.time)}
+              </Text>
             </View>
-            <Text style={styles.capacityText}>
-              {Math.round(getCapacityPercentage())}% заполнено
-            </Text>
           </View>
 
-          {/* Reviews Section */}
-          <View style={styles.reviewsSection}>
-            <View style={styles.reviewsHeader}>
-              <Text style={styles.sectionTitle}>Отзывы ({reviews.length})</Text>
-              <TouchableOpacity onPress={() => setReviewModalVisible(true)}>
-                <Text style={styles.addReviewButton}>Добавить отзыв</Text>
-              </TouchableOpacity>
+          <View style={styles.infoItem}>
+            <Ionicons name="location" size={20} color="#667eea" />
+            <View style={styles.infoText}>
+              <Text style={styles.infoLabel}>Место проведения</Text>
+              <Text style={styles.infoValue}>{event.venue || event.location}</Text>
             </View>
-            
-            {reviews.length > 0 ? (
-              reviews.slice(0, 3).map((review, index) => (
-                <ReviewItem key={review.id} review={review} index={index} />
-              ))
-            ) : (
-              <TouchableOpacity
-                style={styles.addFirstReviewButton}
-                onPress={() => setReviewModalVisible(true)}
-              >
-                <Ionicons name="star-outline" size={20} color="#667eea" />
-                <Text style={styles.addFirstReviewText}>Оставить первый отзыв</Text>
-              </TouchableOpacity>
-            )}
           </View>
-        </Animated.View>
-      </ScrollView>
+
+          <View style={styles.infoItem}>
+            <Ionicons name="ticket" size={20} color="#667eea" />
+            <View style={styles.infoText}>
+              <Text style={styles.infoLabel}>Доступно билетов</Text>
+              <Text style={[
+                styles.infoValue,
+                { color: event.available_tickets > 0 ? '#4CAF50' : '#f44336' }
+              ]}>
+                {event.available_tickets} из {event.capacity}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Description */}
+        {event.description && (
+          <View style={styles.descriptionSection}>
+            <Text style={styles.sectionTitle}>Описание</Text>
+            <Text style={styles.description}>{event.description}</Text>
+          </View>
+        )}
+
+        {/* Capacity Progress */}
+        <View style={styles.capacitySection}>
+          <Text style={styles.sectionTitle}>Заполненность</Text>
+          <View style={styles.capacityBar}>
+            <View
+              style={[
+                styles.capacityFill,
+                { 
+                  width: `${getCapacityPercentage()}%`,
+                  backgroundColor: getCapacityPercentage() > 90 ? '#f44336' : 
+                                 getCapacityPercentage() > 70 ? '#FFD700' : '#4CAF50'
+                }
+              ]}
+            />
+          </View>
+          <Text style={styles.capacityText}>
+            {Math.round(getCapacityPercentage())}% заполнено
+          </Text>
+        </View>
+
+        {/* Reviews Section */}
+        <View style={styles.reviewsSection}>
+          <View style={styles.reviewsHeader}>
+            <Text style={styles.sectionTitle}>Отзывы ({reviews.length})</Text>
+            <TouchableOpacity onPress={() => setReviewModalVisible(true)}>
+              <Text style={styles.addReviewButton}>Добавить отзыв</Text>
+            </TouchableOpacity>
+          </View>
+          
+          {reviews.length > 0 ? (
+            reviews.slice(0, 3).map((review, index) => (
+              <ReviewItem key={review.id} review={review} index={index} />
+            ))
+          ) : (
+            <TouchableOpacity
+              style={styles.addFirstReviewButton}
+              onPress={() => setReviewModalVisible(true)}
+            >
+              <Ionicons name="star-outline" size={20} color="#667eea" />
+              <Text style={styles.addFirstReviewText}>Оставить первый отзыв</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      </Animated.View>
 
       {/* Footer */}
       <Animated.View style={[styles.footer, { opacity: fadeAnim }]}>
@@ -597,8 +579,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f8fafc',
   },
-  scrollView: {
-    flex: 1,
+  headerSafeArea: {
+    backgroundColor: '#667eea',
   },
   heroContainer: {
     height: 300,
@@ -632,7 +614,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 40,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight || 32 : 24,
     paddingHorizontal: 16,
   },
   backButton: {
