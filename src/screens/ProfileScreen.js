@@ -22,6 +22,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { worldEvents } from '../data/WorldEvents';
 import { favoriteStorage } from '../data/FavoriteStorage';
+import UserStorage from '../data/UserStorage';
 
 const { width, height } = Dimensions.get('window');
 
@@ -480,10 +481,11 @@ export default function ProfileScreen({ navigation, route }) {
   };
 
   // Выйти из аккаунта
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setSettingsModalVisible(false);
-    Alert.alert('Выход', 'Вы вышли из аккаунта!');
-    // Здесь можно добавить логику выхода
+    await UserStorage.logout();
+    window.setIsLoggedIn(false);
+    // navigation.reset(...) больше не нужен
   };
 
   const renderQuickActions = () => (

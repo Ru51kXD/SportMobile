@@ -372,67 +372,63 @@ export default function SeatSelectionScreen({ navigation, route }) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <LinearGradient
-        colors={['#667eea', '#764ba2']}
-        style={styles.header}
-      >
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name="arrow-back" size={24} color="white" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Выбор мест</Text>
-        <View style={styles.sportIndicator}>
-          <Ionicons name="trophy" size={20} color="white" />
+    <LinearGradient colors={['#f5f7fa', '#c3cfe2']} style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <StatusBar barStyle="dark-content" backgroundColor="#f5f7fa" />
+        <View style={styles.headerRow}>
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={26} color="#fff" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Выбор мест</Text>
+          <View style={{ width: 40 }} />
         </View>
-      </LinearGradient>
-
-      <View style={styles.eventInfo}>
-        <Text style={styles.eventTitle}>{event?.title || 'Мероприятие'}</Text>
-        <Text style={styles.eventDetails}>
-          {event?.date || 'Дата не указана'} • {event?.location || event?.venue || 'Место не указано'}
-        </Text>
-      </View>
-
-      {renderSectionLegend()}
-
-      <View style={styles.instructionContainer}>
-        <Text style={styles.instructionText}>
-          👆 Нажмите на места для выбора • 🔍 Используйте жесты для масштабирования
-        </Text>
-        {selectedSeats.length > 0 && (
-          <Text style={styles.selectedHint}>
-            ✨ Выбрано: {selectedSeats.length} {selectedSeats.length === 1 ? 'место' : selectedSeats.length < 5 ? 'места' : 'мест'}
-          </Text>
-        )}
-      </View>
-
-      {renderSeatingMap()}
-
-      {selectedSeats.length > 0 && (
-        <View style={styles.bookingFooter}>
-          <View style={styles.bookingInfo}>
-            <Text style={styles.selectedCount}>
-              Выбрано: {selectedSeats.length} {selectedSeats.length === 1 ? 'место' : selectedSeats.length < 5 ? 'места' : 'мест'}
-            </Text>
-            <Text style={styles.totalPrice}>
-              {getTotalPrice().toLocaleString('ru-RU')} ₸
+        <View style={styles.container}>
+          <View style={styles.eventInfo}>
+            <Text style={styles.eventTitle}>{event?.title || 'Мероприятие'}</Text>
+            <Text style={styles.eventDetails}>
+              {event?.date || 'Дата не указана'} • {event?.location || event?.venue || 'Место не указано'}
             </Text>
           </View>
-          <TouchableOpacity style={styles.bookButton} onPress={handleBookSeats}>
-            <LinearGradient
-              colors={venueConfig ? venueConfig.colors : ['#667eea', '#764ba2']}
-              style={styles.bookButtonGradient}
-            >
-              <Ionicons name="arrow-forward" size={20} color="white" />
-              <Text style={styles.bookButtonText}>К оплате</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+
+          {renderSectionLegend()}
+
+          <View style={styles.instructionContainer}>
+            <Text style={styles.instructionText}>
+              👆 Нажмите на места для выбора • 🔍 Используйте жесты для масштабирования
+            </Text>
+            {selectedSeats.length > 0 && (
+              <Text style={styles.selectedHint}>
+                ✨ Выбрано: {selectedSeats.length} {selectedSeats.length === 1 ? 'место' : selectedSeats.length < 5 ? 'места' : 'мест'}
+              </Text>
+            )}
+          </View>
+
+          {renderSeatingMap()}
+
+          {selectedSeats.length > 0 && (
+            <View style={styles.bookingFooter}>
+              <View style={styles.bookingInfo}>
+                <Text style={styles.selectedCount}>
+                  Выбрано: {selectedSeats.length} {selectedSeats.length === 1 ? 'место' : selectedSeats.length < 5 ? 'места' : 'мест'}
+                </Text>
+                <Text style={styles.totalPrice}>
+                  {getTotalPrice().toLocaleString('ru-RU')} ₸
+                </Text>
+              </View>
+              <TouchableOpacity style={styles.bookButton} onPress={handleBookSeats}>
+                <LinearGradient
+                  colors={venueConfig ? venueConfig.colors : ['#667eea', '#764ba2']}
+                  style={styles.bookButtonGradient}
+                >
+                  <Ionicons name="arrow-forward" size={20} color="white" />
+                  <Text style={styles.bookButtonText}>К оплате</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
-      )}
-    </SafeAreaView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 }
 
@@ -441,16 +437,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5',
   },
-  header: {
+  headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingTop: Platform.OS === 'ios' ? 44 : (StatusBar.currentHeight ? StatusBar.currentHeight + 10 : 34),
     paddingBottom: 15,
+    backgroundColor: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
   },
   backButton: {
-    marginRight: 15,
+    backgroundColor: 'rgba(102,126,234,0.85)',
+    borderRadius: 22,
+    padding: 6,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOpacity: 0.10,
+    shadowRadius: 8,
   },
   headerTitle: {
     fontSize: 20,
@@ -458,10 +461,6 @@ const styles = StyleSheet.create({
     color: 'white',
     flex: 1,
     textAlign: 'center',
-  },
-  sportIndicator: {
-    width: 40,
-    alignItems: 'center',
   },
   eventInfo: {
     backgroundColor: 'white',

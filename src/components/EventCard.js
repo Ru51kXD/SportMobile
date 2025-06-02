@@ -110,31 +110,15 @@ const EventCard = ({ event, onPress }) => {
             </View>
 
             <View style={styles.availabilitySection}>
-              <View style={[
-                styles.availabilityDot,
-                { backgroundColor: getAvailabilityColor() }
-              ]} />
-              <Text 
-                style={[
-                  styles.availabilityText,
-                  { color: (event.available_tickets || 0) > 0 ? '#4CAF50' : '#f44336' }
-                ]}
-              >
-                {(event.available_tickets || 0) > 0 ? 'Доступно' : 'Нет мест'}
-              </Text>
-              <Text 
-                style={[
-                  styles.availabilityCount,
-                  { color: (event.available_tickets || 0) > 0 ? '#4CAF50' : '#f44336' }
-                ]}
-              >
-                {event.available_tickets || 0}
+              <View style={[styles.availabilityDot, { backgroundColor: getAvailabilityColor() }]} />
+              <Text style={styles.availabilityText}>Доступно</Text>
+              <Text style={styles.availabilityCount}>
+                {event.available_tickets}/{event.capacity}
               </Text>
             </View>
           </View>
 
-          {/* Rating */}
-          {event.rating && (
+          {event.rating > 0 && (
             <View style={styles.ratingRow}>
               <View style={styles.stars}>
                 {renderStars(event.rating)}

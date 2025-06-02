@@ -1,4 +1,5 @@
-export const worldEvents = [
+// Новый глобальный in-memory EventStorage
+const _defaultEvents = [
   {
     id: 'ufc-301',
     title: 'UFC 301: Pereira vs Prochazka',
@@ -231,5 +232,21 @@ export const worldEvents = [
   }
 ];
 
-export const featuredEvents = worldEvents.filter(event => event.isHot);
-export const upcomingEvents = worldEvents.sort((a, b) => new Date(a.date) - new Date(b.date)); 
+let _events = [..._defaultEvents];
+
+const EventStorage = {
+  getEvents() {
+    return _events;
+  },
+  addEvent(event) {
+    _events = [event, ..._events];
+  },
+  resetEvents() {
+    _events = [..._defaultEvents];
+  }
+};
+
+export default EventStorage;
+
+export const featuredEvents = EventStorage.getEvents().filter(event => event.isHot);
+export const upcomingEvents = EventStorage.getEvents().slice().sort((a, b) => new Date(a.date) - new Date(b.date)); 

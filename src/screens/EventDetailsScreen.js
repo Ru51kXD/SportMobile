@@ -263,6 +263,48 @@ const EventDetailsScreen = ({ route, navigation }) => {
     );
   };
 
+  const renderSeatSections = () => {
+    if (!event.seatPricing) return null;
+
+    return (
+      <View style={styles.seatSectionsContainer}>
+        <Text style={styles.sectionTitle}>Секции и цены</Text>
+        {event.seatPricing.map((section, index) => (
+          <View key={index} style={styles.seatSection}>
+            <View style={[styles.seatSectionHeader, { backgroundColor: section.color + '20' }]}>
+              <Text style={[styles.seatSectionTitle, { color: section.color }]}>
+                {section.name}
+              </Text>
+            </View>
+            <View style={styles.seatSectionContent}>
+              <View style={styles.seatSectionInfo}>
+                <Text style={styles.seatSectionPrice}>
+                  {Number(section.price).toLocaleString('ru-RU')} ₸
+                </Text>
+                <Text style={styles.seatSectionCapacity}>
+                  {section.capacity} мест
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={[styles.selectSeatsButton, { backgroundColor: section.color + '20' }]}
+                onPress={() => navigation.navigate('SeatSelection', { 
+                  event,
+                  section: section.name,
+                  price: section.price,
+                  capacity: section.capacity
+                })}
+              >
+                <Text style={[styles.selectSeatsText, { color: section.color }]}>
+                  Выбрать места
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ))}
+      </View>
+    );
+  };
+
   const BookingModal = () => (
     <Modal
       animationType="slide"
@@ -449,127 +491,245 @@ const EventDetailsScreen = ({ route, navigation }) => {
 
         {/* Event Info */}
         <View style={styles.infoSection}>
-          <View style={styles.infoItem}>
-            <Ionicons name="calendar" size={20} color="#667eea" />
-            <View style={styles.infoText}>
-              <Text style={styles.infoLabel}>Дата и время</Text>
-              <Text style={styles.infoValue}>
-                {formatDate(event.date)} в {formatTime(event.time)}
+          <View style={styles.infoRow}>
+            <View style={styles.infoItem}>
+              <Ionicons name="calendar-outline" size={20} color="#667eea" />
+              <Text style={styles.infoText}>
+                {formatDate(event.date)}
+              </Text>
+            </View>
+            <View style={styles.infoItem}>
+              <Ionicons name="time-outline" size={20} color="#667eea" />
+              <Text style={styles.infoText}>
+                {formatTime(event.time)}
               </Text>
             </View>
           </View>
 
-          <View style={styles.infoItem}>
-            <Ionicons name="location" size={20} color="#667eea" />
-            <View style={styles.infoText}>
-              <Text style={styles.infoLabel}>Место проведения</Text>
-              <Text style={styles.infoValue}>{event.venue || event.location}</Text>
+          <View style={styles.infoRow}>
+            <View style={styles.infoItem}>
+              <Ionicons name="location-outline" size={20} color="#667eea" />
+              <Text style={styles.infoText}>
+                {event.location}
+              </Text>
             </View>
-          </View>
-
-          <View style={styles.infoItem}>
-            <Ionicons name="ticket" size={20} color="#667eea" />
-            <View style={styles.infoText}>
-              <Text style={styles.infoLabel}>Доступно билетов</Text>
-              <Text style={[
-                styles.infoValue,
-                { color: event.available_tickets > 0 ? '#4CAF50' : '#f44336' }
-              ]}>
-                {event.available_tickets} из {event.capacity}
+            <View style={styles.infoItem}>
+              <Ionicons name="people-outline" size={20} color="#667eea" />
+              <Text style={styles.infoText}>
+                {event.available_tickets} мест
               </Text>
             </View>
           </View>
         </View>
 
         {/* Description */}
-        {event.description && (
-          <View style={styles.descriptionSection}>
-            <Text style={styles.sectionTitle}>Описание</Text>
-            <Text style={styles.description}>{event.description}</Text>
-          </View>
-        )}
-
-        {/* Capacity Progress */}
-        <View style={styles.capacitySection}>
-          <Text style={styles.sectionTitle}>Заполненность</Text>
-          <View style={styles.capacityBar}>
-            <View
-              style={[
-                styles.capacityFill,
-                { 
-                  width: `${getCapacityPercentage()}%`,
-                  backgroundColor: getCapacityPercentage() > 90 ? '#f44336' : 
-                                 getCapacityPercentage() > 70 ? '#FFD700' : '#4CAF50'
-                }
-              ]}
-            />
-          </View>
-          <Text style={styles.capacityText}>
-            {Math.round(getCapacityPercentage())}% заполнено
+        <View style={styles.descriptionSection}>
+          <Text style={styles.sectionTitle}>Описание</Text>
+          <Text style={styles.description}>
+            {event.description}
           </Text>
         </View>
+
+        {/* Price */}
+        <View style={styles.priceSection}>
+          <Text style={styles.priceLabel}>Цена билета</Text>
+          <Text style={styles.price}>
+            {formatPrice(event.price)}
+          </Text>
+          {event.discount > 0 && (
+            <Text style={styles.originalPrice}>
+              {formatPrice(event.originalPrice)}
+            </Text>
+          )}
+        </View>
+
+        {/* Add seat sections before the book button */}
+        {renderSeatSections()}
 
         {/* Reviews Section */}
         <View style={styles.reviewsSection}>
           <View style={styles.reviewsHeader}>
-            <Text style={styles.sectionTitle}>Отзывы ({reviews.length})</Text>
-            <TouchableOpacity onPress={() => setReviewModalVisible(true)}>
-              <Text style={styles.addReviewButton}>Добавить отзыв</Text>
-            </TouchableOpacity>
-          </View>
-          
-          {reviews.length > 0 ? (
-            reviews.slice(0, 3).map((review, index) => (
-              <ReviewItem key={review.id} review={review} index={index} />
-            ))
-          ) : (
+            <Text style={styles.sectionTitle}>Отзывы</Text>
             <TouchableOpacity
-              style={styles.addFirstReviewButton}
+              style={styles.addReviewButton}
               onPress={() => setReviewModalVisible(true)}
             >
-              <Ionicons name="star-outline" size={20} color="#667eea" />
-              <Text style={styles.addFirstReviewText}>Оставить первый отзыв</Text>
+              <Ionicons name="add-circle" size={24} color="#667eea" />
             </TouchableOpacity>
+          </View>
+
+          {reviews.length > 0 ? (
+            reviews.map((review, index) => (
+              <View key={index} style={styles.reviewCard}>
+                <View style={styles.reviewHeader}>
+                  <View style={styles.reviewerInfo}>
+                    <Ionicons name="person-circle" size={24} color="#667eea" />
+                    <Text style={styles.reviewerName}>{review.userName}</Text>
+                  </View>
+                  <View style={styles.reviewRating}>
+                    {getRatingStars(review.rating)}
+                  </View>
+                </View>
+                <Text style={styles.reviewText}>{review.comment}</Text>
+                <Text style={styles.reviewDate}>
+                  {formatDate(review.createdAt)}
+                </Text>
+              </View>
+            ))
+          ) : (
+            <Text style={styles.noReviews}>
+              Пока нет отзывов. Будьте первым!
+            </Text>
           )}
         </View>
       </Animated.View>
 
-      {/* Footer */}
-      <Animated.View style={[styles.footer, { opacity: fadeAnim }]}>
-        <View style={styles.priceContainer}>
-          <Text style={styles.priceLabel}>Цена билета:</Text>
-          <Text style={styles.price}>{formatPrice(event.price)}</Text>
-        </View>
-        
-        <TouchableOpacity
-          style={styles.footerButton}
-          onPress={() => setModalVisible(true)}
-          disabled={event.available_tickets === 0}
-        >
-          <LinearGradient
-            colors={event.available_tickets > 0 ? ['#667eea', '#764ba2'] : ['#ccc', '#999']}
-            style={styles.footerButtonGradient}
-          >
-            <Text style={styles.footerButtonText}>
-              {event.available_tickets > 0 ? "Забронировать" : "Билетов нет"}
-            </Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </Animated.View>
+      {/* Booking Modal */}
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="slide"
+      >
+        <View style={styles.modalOverlay}>
+          <Animated.View style={[styles.modalContent, {
+            transform: [{ translateY: slideAnim }]
+          }]}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Бронирование</Text>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setModalVisible(false)}
+              >
+                <Ionicons name="close" size={24} color="#667eea" />
+              </TouchableOpacity>
+            </View>
 
-      {/* Success Animation */}
+            <View style={styles.modalBody}>
+              <Text style={styles.modalLabel}>Ваше имя</Text>
+              <TextInput
+                style={styles.modalInput}
+                value={userName}
+                onChangeText={setUserName}
+                placeholder="Введите ваше имя"
+                placeholderTextColor="#999"
+              />
+
+              <Text style={styles.modalLabel}>Количество билетов</Text>
+              <View style={styles.ticketsCounter}>
+                <TouchableOpacity
+                  style={styles.counterButton}
+                  onPress={() => setTicketsCount(Math.max(1, ticketsCount - 1))}
+                >
+                  <Ionicons name="remove" size={24} color="#667eea" />
+                </TouchableOpacity>
+                <Text style={styles.ticketsCount}>{ticketsCount}</Text>
+                <TouchableOpacity
+                  style={styles.counterButton}
+                  onPress={() => setTicketsCount(Math.min(event.available_tickets, ticketsCount + 1))}
+                >
+                  <Ionicons name="add" size={24} color="#667eea" />
+                </TouchableOpacity>
+              </View>
+
+              <Text style={styles.totalPrice}>
+                Итого: {formatPrice(event.price * ticketsCount)}
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              style={styles.confirmButton}
+              onPress={handleBooking}
+            >
+              <LinearGradient
+                colors={['#667eea', '#764ba2']}
+                style={styles.confirmGradient}
+              >
+                <Ionicons name="checkmark-circle" size={24} color="white" />
+                <Text style={styles.confirmText}>Подтвердить</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
+      </Modal>
+
+      {/* Review Modal */}
+      <Modal
+        visible={reviewModalVisible}
+        transparent={true}
+        animationType="slide"
+      >
+        <View style={styles.modalOverlay}>
+          <Animated.View style={[styles.modalContent, {
+            transform: [{ translateY: slideAnim }]
+          }]}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Оставить отзыв</Text>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setReviewModalVisible(false)}
+              >
+                <Ionicons name="close" size={24} color="#667eea" />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.modalBody}>
+              <Text style={styles.modalLabel}>Ваша оценка</Text>
+              <View style={styles.ratingStars}>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <TouchableOpacity
+                    key={star}
+                    onPress={() => setRating(star)}
+                  >
+                    <Ionicons
+                      name={star <= rating ? "star" : "star-outline"}
+                      size={32}
+                      color="#FFD700"
+                    />
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <Text style={styles.modalLabel}>Ваш отзыв</Text>
+              <TextInput
+                style={[styles.modalInput, styles.reviewInput]}
+                value={reviewComment}
+                onChangeText={setReviewComment}
+                placeholder="Расскажите о вашем опыте..."
+                placeholderTextColor="#999"
+                multiline
+                numberOfLines={4}
+              />
+            </View>
+
+            <TouchableOpacity
+              style={styles.confirmButton}
+              onPress={handleReview}
+            >
+              <LinearGradient
+                colors={['#667eea', '#764ba2']}
+                style={styles.confirmGradient}
+              >
+                <Ionicons name="send" size={24} color="white" />
+                <Text style={styles.confirmText}>Отправить</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
+      </Modal>
+
+      {/* Success Overlay */}
       <Animated.View style={[styles.successOverlay, {
         opacity: successAnim,
         transform: [{ scale: successAnim }]
       }]}>
-        <View style={styles.successContent}>
-          <Ionicons name="checkmark-circle" size={64} color="#4CAF50" />
+        <LinearGradient
+          colors={['#4CAF50', '#66BB6A', '#81C784']}
+          style={styles.successGradient}
+        >
+          <Ionicons name="checkmark-circle" size={80} color="white" />
           <Text style={styles.successText}>Успешно!</Text>
-        </View>
+        </LinearGradient>
       </Animated.View>
-
-      <BookingModal />
-      <ReviewModal />
     </SafeAreaView>
   );
 };
@@ -677,21 +837,17 @@ const styles = StyleSheet.create({
   infoSection: {
     marginBottom: 24,
   },
-  infoItem: {
+  infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
   },
+  infoItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 16,
+  },
   infoText: {
-    marginLeft: 12,
-    flex: 1,
-  },
-  infoLabel: {
-    fontSize: 14,
-    color: '#667eea',
-    marginBottom: 2,
-  },
-  infoValue: {
     fontSize: 16,
     fontWeight: '600',
     color: '#1a202c',
@@ -710,23 +866,23 @@ const styles = StyleSheet.create({
     color: '#667eea',
     lineHeight: 24,
   },
-  capacitySection: {
+  priceSection: {
     marginBottom: 24,
   },
-  capacityBar: {
-    height: 8,
-    backgroundColor: '#e0e0e0',
-    borderRadius: 4,
-    marginBottom: 8,
-  },
-  capacityFill: {
-    height: '100%',
-    borderRadius: 4,
-  },
-  capacityText: {
+  priceLabel: {
     fontSize: 14,
     color: '#667eea',
-    textAlign: 'center',
+    marginBottom: 4,
+  },
+  price: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#667eea',
+  },
+  originalPrice: {
+    fontSize: 14,
+    color: '#667eea',
+    textDecorationLine: 'line-through',
   },
   reviewsSection: {
     marginBottom: 24,
@@ -742,7 +898,7 @@ const styles = StyleSheet.create({
     color: '#667eea',
     fontWeight: '600',
   },
-  reviewItem: {
+  reviewCard: {
     backgroundColor: 'white',
     padding: 16,
     borderRadius: 12,
@@ -759,15 +915,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8,
   },
+  reviewerInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   reviewerName: {
     fontSize: 16,
     fontWeight: '600',
     color: '#1a202c',
+    marginLeft: 8,
   },
   reviewRating: {
     flexDirection: 'row',
   },
-  reviewComment: {
+  reviewText: {
     fontSize: 14,
     color: '#667eea',
     lineHeight: 20,
@@ -777,65 +938,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#667eea',
   },
-  addFirstReviewButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'white',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 24,
-    borderWidth: 2,
-    borderColor: '#667eea20',
-    borderStyle: 'dashed',
-  },
-  addFirstReviewText: {
-    fontSize: 16,
-    color: '#667eea',
-    fontWeight: '600',
-    marginLeft: 8,
-  },
-  footer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 16,
-    backgroundColor: 'white',
-    borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 10,
-  },
-  priceContainer: {
-    flex: 1,
-  },
-  priceLabel: {
+  noReviews: {
     fontSize: 14,
     color: '#667eea',
-    marginBottom: 4,
+    textAlign: 'center',
   },
-  price: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#667eea',
-  },
-  footerButton: {
-    flex: 1,
-    marginLeft: 16,
-  },
-  footerButtonGradient: {
-    paddingVertical: 16,
-    alignItems: 'center',
-  },
-  footerButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-  // Modal Styles
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -865,14 +972,14 @@ const styles = StyleSheet.create({
   modalBody: {
     padding: 20,
   },
-  inputLabel: {
+  modalLabel: {
     fontSize: 16,
     fontWeight: '600',
     color: '#1a202c',
     marginBottom: 8,
     marginTop: 16,
   },
-  input: {
+  modalInput: {
     borderWidth: 1,
     borderColor: '#e0e0e0',
     borderRadius: 12,
@@ -881,11 +988,7 @@ const styles = StyleSheet.create({
     color: '#1a202c',
     backgroundColor: '#f8fafc',
   },
-  textArea: {
-    height: 100,
-    textAlignVertical: 'top',
-  },
-  ticketsSelector: {
+  ticketsCounter: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -893,7 +996,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
   },
-  ticketButton: {
+  counterButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
@@ -910,57 +1013,24 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   totalPrice: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#667eea',
     marginTop: 20,
     padding: 16,
     backgroundColor: '#667eea10',
     borderRadius: 12,
   },
-  totalPriceLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1a202c',
-  },
-  totalPriceValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#667eea',
-  },
-  ratingSelector: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 8,
-    padding: 16,
-    backgroundColor: '#f8fafc',
-    borderRadius: 12,
-  },
-  modalFooter: {
-    padding: 20,
-  },
-  bookingButton: {
+  confirmButton: {
     borderRadius: 12,
     overflow: 'hidden',
+    marginTop: 20,
   },
-  bookingButtonGradient: {
+  confirmGradient: {
     paddingVertical: 16,
     alignItems: 'center',
   },
-  bookingButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-  reviewButton: {
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  reviewButtonGradient: {
-    paddingVertical: 16,
-    alignItems: 'center',
-  },
-  reviewButtonText: {
+  confirmText: {
     fontSize: 16,
     fontWeight: 'bold',
     color: 'white',
@@ -975,8 +1045,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  successContent: {
-    backgroundColor: 'white',
+  successGradient: {
     padding: 40,
     borderRadius: 20,
     alignItems: 'center',
@@ -986,6 +1055,55 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#4CAF50',
     marginTop: 16,
+  },
+  seatSectionsContainer: {
+    marginBottom: 24,
+  },
+  seatSection: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    marginBottom: 12,
+    overflow: 'hidden',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  seatSectionHeader: {
+    padding: 12,
+  },
+  seatSectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  seatSectionContent: {
+    padding: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  seatSectionInfo: {
+    flex: 1,
+  },
+  seatSectionPrice: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1a202c',
+    marginBottom: 4,
+  },
+  seatSectionCapacity: {
+    fontSize: 14,
+    color: '#718096',
+  },
+  selectSeatsButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  selectSeatsText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
 

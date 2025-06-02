@@ -16,13 +16,14 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import AnimatedEventCard from '../components/AnimatedEventCard';
-import { worldEvents, featuredEvents } from '../data/WorldEvents';
+import EventStorage from '../data/WorldEvents';
+import { featuredEvents } from '../data/WorldEvents';
 
 const { width, height } = Dimensions.get('window');
 
 const HomeScreen = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredEvents, setFilteredEvents] = useState(worldEvents);
+  const [filteredEvents, setFilteredEvents] = useState(EventStorage.getEvents());
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [refreshing, setRefreshing] = useState(false);
   
@@ -85,19 +86,27 @@ const HomeScreen = ({ navigation }) => {
   }, [searchQuery, selectedCategory]);
 
   const filterEvents = () => {
-    let filtered = worldEvents;
+    let filtered = EventStorage.getEvents();
 
     if (selectedCategory !== 'all') {
       filtered = filtered.filter(event => event.sport === selectedCategory);
     }
 
     if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
       filtered = filtered.filter(event =>
-        event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        event.sport.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        event.location.toLowerCase().includes(searchQuery.toLowerCase())
+        event.title.toLowerCase().includes(query) ||
+        event.sport.toLowerCase().includes(query) ||
+        event.category.toLowerCase().includes(query) ||
+        event.location.toLowerCase().includes(query) ||
+        event.venue.toLowerCase().includes(query) ||
+        event.description.toLowerCase().includes(query) ||
+        event.tags.some(tag => tag.toLowerCase().includes(query))
       );
     }
+
+    // Sort by date for better relevance
+    filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     setFilteredEvents(filtered);
   };
@@ -152,38 +161,34 @@ const HomeScreen = ({ navigation }) => {
     );
   };
 
-  const renderSearchBar = () => {
-    const searchY = searchAnimation.interpolate({
-      inputRange: [0, 1],
-      outputRange: [50, 0],
-    });
-
-    return (
-      <Animated.View style={[styles.searchContainer, { 
-        transform: [{ translateY: searchY }],
-        opacity: searchAnimation 
-      }]}>
-        <LinearGradient
-          colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.7)']}
-          style={styles.searchGradient}
-        >
-          <Ionicons name="search" size={20} color="#667eea" />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Поиск событий UFC, NBA, FIFA..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholderTextColor="#999"
-          />
-          {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Ionicons name="close-circle" size={20} color="#667eea" />
-            </TouchableOpacity>
-          )}
-        </LinearGradient>
-      </Animated.View>
-    );
-  };
+  const renderSearchBar = () => (
+    <Animated.View style={[styles.searchContainer, { 
+      opacity: searchAnimation,
+      transform: [{ translateY: searchAnimation.interpolate({
+        inputRange: [0, 1],
+        outputRange: [20, 0]
+      })}]
+    }]}>
+      <View style={styles.searchBar}>
+        <Ionicons name="search" size={20} color="#667eea" />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Поиск событий..."
+          placeholderTextColor="#999"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+        {searchQuery ? (
+          <TouchableOpacity
+            onPress={() => setSearchQuery('')}
+            style={styles.clearButton}
+          >
+            <Ionicons name="close-circle" size={20} color="#999" />
+          </TouchableOpacity>
+        ) : null}
+      </View>
+    </Animated.View>
+  );
 
   const renderCategories = () => (
     <Animated.View style={[styles.categoriesContainer, { opacity: fadeAnim }]}>
@@ -239,7 +244,7 @@ const HomeScreen = ({ navigation }) => {
       </View>
       
       <FlatList
-        data={featuredEvents}
+        data={featuredEvents || []}
         renderItem={({ item, index }) => (
           <AnimatedEventCard
             event={item}
@@ -281,30 +286,36 @@ const HomeScreen = ({ navigation }) => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#667eea" />
-      
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl 
-            refreshing={refreshing} 
-            onRefresh={onRefresh}
-            colors={['#667eea']}
-            tintColor="#667eea"
-          />
-        }
-      >
-        {renderHeader()}
-        {renderSearchBar()}
-        {renderCategories()}
-        {renderFeaturedSection()}
-        {renderAllEvents()}
-        
-        <View style={styles.bottomSpacing} />
-      </ScrollView>
-    </SafeAreaView>
+    <LinearGradient colors={['#f5f7fa', '#c3cfe2']} style={{ flex: 1 }}>
+      <SafeAreaView style={[styles.container, { backgroundColor: 'transparent' }]}> 
+        <StatusBar barStyle="dark-content" backgroundColor="#f5f7fa" />
+        <ScrollView
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl 
+              refreshing={refreshing} 
+              onRefresh={onRefresh}
+              colors={['#667eea']}
+              tintColor="#667eea"
+            />
+          }
+        >
+          {renderHeader()}
+          <View style={styles.sectionBlock}>
+            {renderSearchBar()}
+            {renderCategories()}
+          </View>
+          <View style={styles.sectionBlock}>
+            {renderFeaturedSection()}
+          </View>
+          <View style={styles.sectionBlock}>
+            {renderAllEvents()}
+          </View>
+          <View style={styles.bottomSpacing} />
+        </ScrollView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
@@ -351,27 +362,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   searchContainer: {
-    marginHorizontal: 20,
-    marginBottom: 25,
-    borderRadius: 15,
-    overflow: 'hidden',
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    paddingHorizontal: 20,
+    marginBottom: 20,
   },
-  searchGradient: {
+  searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
+    backgroundColor: 'white',
+    borderRadius: 12,
+    paddingHorizontal: 15,
+    height: 50,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   searchInput: {
     flex: 1,
+    marginLeft: 10,
     fontSize: 16,
-    marginLeft: 12,
     color: '#333',
+  },
+  clearButton: {
+    padding: 5,
   },
   categoriesContainer: {
     marginBottom: 25,
@@ -412,11 +426,12 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#1a202c',
+    color: '#22223b',
+    marginBottom: 4,
   },
   sectionSubtitle: {
     fontSize: 14,
-    color: '#718096',
+    color: '#4a4e69',
     marginHorizontal: 20,
     marginBottom: 15,
   },
@@ -441,6 +456,19 @@ const styles = StyleSheet.create({
   },
   bottomSpacing: {
     height: 100,
+  },
+  sectionBlock: {
+    backgroundColor: 'rgba(255,255,255,0.85)',
+    borderRadius: 24,
+    marginHorizontal: 12,
+    marginBottom: 18,
+    paddingVertical: 18,
+    paddingHorizontal: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.07,
+    shadowRadius: 16,
+    elevation: 6,
   },
 });
 

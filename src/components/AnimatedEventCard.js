@@ -105,147 +105,81 @@ const AnimatedEventCard = ({ event, onPress, index = 0 }) => {
     outputRange: [-width, width],
   });
 
+  const animatedStyle = {
+    opacity: fadeAnim,
+    transform: [
+      { translateY: slideAnim },
+      { scale: scaleAnim }
+    ]
+  };
+
   return (
-    <Animated.View style={[
-      styles.container,
-      {
-        opacity: fadeAnim,
-        transform: [
-          { translateY: slideAnim },
-          { scale: scaleAnim }
-        ]
-      }
-    ]}>
+    <Animated.View style={[styles.container, animatedStyle]}>
       <TouchableOpacity
-        style={styles.card}
-        onPress={handlePress}
         activeOpacity={0.9}
+        onPress={handlePress}
+        style={styles.touchable}
       >
         <LinearGradient
-          colors={['rgba(255,255,255,0.95)', 'rgba(255,255,255,0.85)']}
-          style={styles.cardGradient}
+          colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.7)']}
+          style={styles.gradient}
         >
-          {/* Background Image */}
-          <View style={styles.imageContainer}>
-            {event.image ? (
-              <Image source={{ uri: event.image }} style={styles.backgroundImage} />
-            ) : (
-              <LinearGradient
-                colors={[event.sport_color || '#667eea', (event.sport_color || '#667eea') + '80']}
-                style={styles.backgroundGradient}
-              >
-                <Ionicons 
-                  name={event.sport_icon || 'trophy'} 
-                  size={40} 
-                  color="rgba(255,255,255,0.8)" 
-                />
-              </LinearGradient>
-            )}
-            
-            {/* Shimmer Effect для горячих событий */}
+          <View style={styles.header}>
+            <View style={[styles.sportBadge, { backgroundColor: event.sport_color + '40' }]}>
+              <Text style={[styles.sportText, { color: event.sport_color }]}>
+                {event.sport}
+              </Text>
+            </View>
             {event.isHot && (
-              <Animated.View style={[
-                styles.shimmerOverlay,
-                {
-                  transform: [{ translateX: shimmerTranslate }]
-                }
-              ]} />
+              <View style={styles.hotBadge}>
+                <Text style={styles.hotText}>HOT</Text>
+              </View>
             )}
           </View>
 
-          {/* Hot Badge */}
-          {event.isHot && (
-            <View style={styles.hotBadge}>
-              <LinearGradient
-                colors={['#FF6B6B', '#FF8E8E']}
-                style={styles.hotBadgeGradient}
-              >
-                <Ionicons name="flame" size={12} color="white" />
-                <Text style={styles.hotBadgeText}>HOT</Text>
-              </LinearGradient>
-            </View>
-          )}
-
-          {/* Discount Badge */}
-          {event.discount && (
-            <View style={styles.discountBadge}>
-              <LinearGradient
-                colors={['#4CAF50', '#66BB6A']}
-                style={styles.discountBadgeGradient}
-              >
-                <Text style={styles.discountText}>-{event.discount}%</Text>
-              </LinearGradient>
-            </View>
-          )}
-
-          {/* Content */}
           <View style={styles.content}>
-            <View style={styles.header}>
-              <View style={styles.eventInfo}>
-                <View style={[styles.sportBadge, { backgroundColor: (event.sport_color || '#667eea') + '20' }]}>
-                  <Text style={[styles.sportText, { color: event.sport_color || '#667eea' }]}>
-                    {event.sport}
-                  </Text>
-                </View>
-                
-                <Text style={styles.title} numberOfLines={2}>
-                  {event.title}
+            <Text style={styles.title} numberOfLines={2}>
+              {event.title}
+            </Text>
+            <View style={styles.locationContainer}>
+              <Ionicons name="location" size={16} color="white" />
+              <Text style={styles.location} numberOfLines={1}>
+                {event.location}
+              </Text>
+            </View>
+            <View style={styles.dateTimeContainer}>
+              <View style={styles.dateTimeItem}>
+                <Ionicons name="calendar" size={16} color="white" />
+                <Text style={styles.dateTimeText}>
+                  {formatDate(event.date)}
                 </Text>
-                
-                <Text style={styles.location} numberOfLines={1}>
-                  📍 {event.location}
+              </View>
+              <View style={styles.dateTimeItem}>
+                <Ionicons name="time" size={16} color="white" />
+                <Text style={styles.dateTimeText}>
+                  {formatTime(event.time)}
                 </Text>
               </View>
             </View>
+          </View>
 
-            <View style={styles.details}>
-              <View style={styles.dateTimeContainer}>
-                <View style={styles.dateTime}>
-                  <Ionicons name="calendar-outline" size={14} color="#667eea" />
-                  <Text style={styles.dateText}>
-                    {formatDate(event.date)}
-                  </Text>
-                </View>
-                
-                <View style={styles.dateTime}>
-                  <Ionicons name="time-outline" size={14} color="#667eea" />
-                  <Text style={styles.timeText}>
-                    {formatTime(event.time)}
-                  </Text>
-                </View>
-              </View>
-
-              <View style={styles.priceContainer}>
-                <Text style={styles.priceLabel}>от</Text>
-                <Text style={styles.price}>
-                  {formatPrice(event.price)}
+          <View style={styles.footer}>
+            <View style={styles.priceContainer}>
+              <Text style={styles.price}>
+                {formatPrice(event.price)}
+              </Text>
+              {event.originalPrice && (
+                <Text style={styles.originalPrice}>
+                  {formatPrice(event.originalPrice)}
                 </Text>
-              </View>
+              )}
             </View>
-
-            {/* Select Seats Button */}
-            <TouchableOpacity
-              style={styles.selectSeatsButton}
-              onPress={handlePress}
-            >
-              <LinearGradient
-                colors={['#667eea', '#764ba2']}
-                style={styles.selectSeatsGradient}
-              >
-                <Ionicons name="checkmark-circle" size={16} color="white" />
-                <Text style={styles.selectSeatsText}>Выбрать места</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-
-            {/* Rating */}
-            {event.rating && event.rating > 0 && (
-              <View style={styles.ratingContainer}>
-                <Ionicons name="star" size={12} color="#FFD700" />
-                <Text style={styles.ratingText}>
-                  {event.rating.toFixed(1)} ({event.reviews_count || 0})
-                </Text>
-              </View>
-            )}
+            <View style={styles.ratingContainer}>
+              <Ionicons name="star" size={16} color="#FFD700" />
+              <Text style={styles.rating}>
+                {event.rating.toFixed(1)} ({event.reviews_count || 0})
+              </Text>
+            </View>
           </View>
         </LinearGradient>
       </TouchableOpacity>
@@ -259,7 +193,7 @@ const styles = StyleSheet.create({
     marginRight: 20,
     marginVertical: 8,
   },
-  card: {
+  touchable: {
     borderRadius: 20,
     overflow: 'hidden',
     shadowColor: '#000',
@@ -268,89 +202,39 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 8,
   },
-  cardGradient: {
+  gradient: {
     flex: 1,
   },
-  imageContainer: {
-    height: 120,
-    position: 'relative',
-    overflow: 'hidden',
-  },
-  backgroundImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-  },
-  backgroundGradient: {
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  shimmerOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(255,255,255,0.3)',
-    width: 100,
-  },
-  hotBadge: {
-    position: 'absolute',
-    top: 12,
-    left: 12,
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  hotBadgeGradient: {
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 12,
+  },
+  sportBadge: {
     paddingHorizontal: 8,
     paddingVertical: 4,
+    borderRadius: 8,
+    marginRight: 8,
   },
-  hotBadgeText: {
-    color: 'white',
+  sportText: {
     fontSize: 10,
-    fontWeight: 'bold',
-    marginLeft: 4,
+    fontWeight: '600',
+    textTransform: 'uppercase',
   },
-  discountBadge: {
+  hotBadge: {
     position: 'absolute',
     top: 12,
     right: 12,
     borderRadius: 12,
     overflow: 'hidden',
   },
-  discountBadgeGradient: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-  discountText: {
+  hotText: {
     color: 'white',
     fontSize: 10,
     fontWeight: 'bold',
   },
   content: {
     padding: 16,
-  },
-  header: {
-    marginBottom: 12,
-  },
-  eventInfo: {
-    flex: 1,
-  },
-  sportBadge: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    marginBottom: 8,
-  },
-  sportText: {
-    fontSize: 10,
-    fontWeight: '600',
-    textTransform: 'uppercase',
   },
   title: {
     fontSize: 16,
@@ -359,74 +243,54 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     marginBottom: 6,
   },
+  locationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
   location: {
     fontSize: 12,
     color: '#718096',
-    marginBottom: 8,
-  },
-  details: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    marginBottom: 12,
   },
   dateTimeContainer: {
-    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
   },
-  dateTime: {
+  dateTimeItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
   },
-  dateText: {
+  dateTimeText: {
     fontSize: 12,
     color: '#667eea',
     marginLeft: 4,
     fontWeight: '600',
   },
-  timeText: {
-    fontSize: 12,
-    color: '#667eea',
-    marginLeft: 4,
-    fontWeight: '600',
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   priceContainer: {
     alignItems: 'flex-end',
-  },
-  priceLabel: {
-    fontSize: 10,
-    color: '#718096',
-    marginBottom: 2,
   },
   price: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#4CAF50',
   },
-  selectSeatsButton: {
-    borderRadius: 12,
-    overflow: 'hidden',
-    marginBottom: 8,
-  },
-  selectSeatsGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-  },
-  selectSeatsText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: '600',
-    marginLeft: 6,
+  originalPrice: {
+    fontSize: 12,
+    color: '#718096',
+    marginLeft: 4,
   },
   ratingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
   },
-  ratingText: {
+  rating: {
     fontSize: 12,
     color: '#718096',
     marginLeft: 4,

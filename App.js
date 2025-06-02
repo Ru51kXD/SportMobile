@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -17,6 +17,11 @@ import ProfileScreen from './src/screens/ProfileScreen';
 import PaymentScreen from './src/screens/PaymentScreen';
 import SupportScreen from './src/screens/SupportScreen';
 import BonusScreen from './src/screens/BonusScreen';
+import AuthScreen from './src/screens/AuthScreen';
+// Следующие экраны будут созданы далее:
+import LoginScreen from './src/screens/LoginScreen';
+import RegisterScreen from './src/screens/RegisterScreen';
+import UserStorage from './src/data/UserStorage';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -90,20 +95,49 @@ function MainTabs() {
   );
 }
 
+function AuthStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Auth" component={AuthScreen} />
+      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Register" component={RegisterScreen} />
+    </Stack.Navigator>
+  );
+}
+
 export default function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(!!UserStorage.getCurrentUser());
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    window.setIsLoggedIn = setIsLoggedIn;
+    // Автоматический вход
+    (async () => {
+      const ok = await UserStorage.loadFromStorage();
+      setIsLoggedIn(!!ok);
+      setIsLoading(false);
+    })();
+  }, []);
+
+  if (isLoading) return null;
+
   return (
     <NavigationContainer>
       <StatusBar style="light" />
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="MainTabs" component={MainTabs} />
-        <Stack.Screen name="EventDetails" component={EventDetailsScreen} />
-        <Stack.Screen name="SeatSelection" component={SeatSelectionScreen} />
-        <Stack.Screen name="Payment" component={PaymentScreen} />
-        <Stack.Screen name="Stats" component={StatsScreen} />
-        <Stack.Screen name="Favorites" component={FavoritesScreen} />
-        <Stack.Screen name="Support" component={SupportScreen} />
-        <Stack.Screen name="Bonus" component={BonusScreen} />
-      </Stack.Navigator>
+      {isLoggedIn ? (
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="MainTabs" component={MainTabs} />
+          <Stack.Screen name="EventDetails" component={EventDetailsScreen} />
+          <Stack.Screen name="SeatSelection" component={SeatSelectionScreen} />
+          <Stack.Screen name="Payment" component={PaymentScreen} />
+          <Stack.Screen name="Stats" component={StatsScreen} />
+          <Stack.Screen name="Favorites" component={FavoritesScreen} />
+          <Stack.Screen name="Support" component={SupportScreen} />
+          <Stack.Screen name="Bonus" component={BonusScreen} />
+        </Stack.Navigator>
+      ) : (
+        <AuthStack />
+      )}
     </NavigationContainer>
   );
 }
