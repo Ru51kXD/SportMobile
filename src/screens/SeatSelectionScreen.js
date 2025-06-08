@@ -33,11 +33,11 @@ export default function SeatSelectionScreen({ navigation, route }) {
           colors: ['#C8102E', '#FF4444'],
           type: 'octagon',
           sections: [
-            { name: 'Cage Side', rows: 2, seats: 16, basePrice: 35000, color: '#FFD700' },
-            { name: 'Floor A', rows: 3, seats: 18, basePrice: 25000, color: '#FF6B35' },
-            { name: 'Floor B', rows: 4, seats: 20, basePrice: 18000, color: '#4ECDC4' },
-            { name: 'Lower Bowl', rows: 5, seats: 22, basePrice: 12000, color: '#45B7D1' },
-            { name: 'Upper Bowl', rows: 6, seats: 24, basePrice: 8000, color: '#96CEB4' },
+            { name: 'Cage Side', rows: 1, seats: 12, basePrice: 35000, color: '#FFD700', shape: 'octagon' },
+            { name: 'Floor A', rows: 1, seats: 16, basePrice: 25000, color: '#FF6B35', shape: 'octagon' },
+            { name: 'Floor B', rows: 1, seats: 18, basePrice: 18000, color: '#4ECDC4', shape: 'octagon' },
+            { name: 'Lower Bowl', rows: 1, seats: 20, basePrice: 12000, color: '#45B7D1', shape: 'octagon' },
+            { name: 'Upper Bowl', rows: 1, seats: 24, basePrice: 8000, color: '#96CEB4', shape: 'octagon' },
           ]
         };
       
@@ -50,12 +50,14 @@ export default function SeatSelectionScreen({ navigation, route }) {
           colors: ['#326295', '#4CAF50'],
           type: 'stadium',
           sections: [
-            { name: 'VIP North', side: 'north', rows: 6, seats: 25, basePrice: 28000, color: '#FFD700' },
-            { name: 'North Stand', side: 'north', rows: 12, seats: 30, basePrice: 18000, color: '#FF6B35' },
-            { name: 'VIP South', side: 'south', rows: 6, seats: 25, basePrice: 28000, color: '#FFD700' },
-            { name: 'South Stand', side: 'south', rows: 12, seats: 30, basePrice: 18000, color: '#FF6B35' },
-            { name: 'East Stand', side: 'east', rows: 10, seats: 20, basePrice: 15000, color: '#4ECDC4' },
-            { name: 'West Stand', side: 'west', rows: 10, seats: 20, basePrice: 15000, color: '#45B7D1' },
+            { name: 'Север A', side: 'north', rows: 2, seats: 15, basePrice: 28000, color: '#FF6B35', shape: 'rectangle' },
+            { name: 'Север B', side: 'north', rows: 2, seats: 15, basePrice: 25000, color: '#FF6B35', shape: 'rectangle' },
+            { name: 'Юг A', side: 'south', rows: 2, seats: 15, basePrice: 28000, color: '#FF6B35', shape: 'rectangle' },
+            { name: 'Юг B', side: 'south', rows: 2, seats: 15, basePrice: 25000, color: '#FF6B35', shape: 'rectangle' },
+            { name: 'Восток A', side: 'east', rows: 2, seats: 8, basePrice: 20000, color: '#45B7D1', shape: 'rectangle' },
+            { name: 'Восток B', side: 'east', rows: 2, seats: 8, basePrice: 18000, color: '#45B7D1', shape: 'rectangle' },
+            { name: 'Запад A', side: 'west', rows: 2, seats: 8, basePrice: 20000, color: '#45B7D1', shape: 'rectangle' },
+            { name: 'Запад B', side: 'west', rows: 2, seats: 8, basePrice: 18000, color: '#45B7D1', shape: 'rectangle' },
           ]
         };
       
@@ -67,11 +69,11 @@ export default function SeatSelectionScreen({ navigation, route }) {
           colors: ['#1D428A', '#FF8C00'],
           type: 'arena',
           sections: [
-            { name: 'Courtside', rows: 2, seats: 12, basePrice: 50000, color: '#FFD700' },
-            { name: 'Lower Level', rows: 6, seats: 18, basePrice: 30000, color: '#FF6B35' },
-            { name: 'Club Level', rows: 5, seats: 16, basePrice: 22000, color: '#4ECDC4' },
-            { name: 'Upper Level', rows: 8, seats: 20, basePrice: 15000, color: '#45B7D1' },
-            { name: 'Nosebleeds', rows: 6, seats: 24, basePrice: 8000, color: '#96CEB4' },
+            { name: 'Courtside', rows: 2, seats: 12, basePrice: 50000, color: '#FFD700', shape: 'rectangle' },
+            { name: 'Lower Level', rows: 6, seats: 18, basePrice: 30000, color: '#FF6B35', shape: 'curve' },
+            { name: 'Club Level', rows: 5, seats: 16, basePrice: 22000, color: '#4ECDC4', shape: 'curve' },
+            { name: 'Upper Level', rows: 8, seats: 20, basePrice: 15000, color: '#45B7D1', shape: 'tier' },
+            { name: 'Nosebleeds', rows: 6, seats: 24, basePrice: 8000, color: '#96CEB4', shape: 'tier' },
           ]
         };
       
@@ -82,72 +84,275 @@ export default function SeatSelectionScreen({ navigation, route }) {
           colors: ['#667eea', '#764ba2'],
           type: 'arena',
           sections: [
-            { name: 'VIP', rows: 3, seats: 16, basePrice: 25000, color: '#FFD700' },
-            { name: 'Premium', rows: 6, seats: 20, basePrice: 18000, color: '#FF6B35' },
-            { name: 'Standard', rows: 8, seats: 24, basePrice: 12000, color: '#4ECDC4' },
-            { name: 'Economy', rows: 10, seats: 28, basePrice: 8000, color: '#96CEB4' },
+            { name: 'VIP', rows: 3, seats: 16, basePrice: 25000, color: '#FFD700', shape: 'circle' },
+            { name: 'Premium', rows: 6, seats: 20, basePrice: 18000, color: '#FF6B35', shape: 'circle' },
+            { name: 'Standard', rows: 8, seats: 24, basePrice: 12000, color: '#4ECDC4', shape: 'curve' },
+            { name: 'Economy', rows: 10, seats: 28, basePrice: 8000, color: '#96CEB4', shape: 'curve' },
           ]
         };
     }
   };
 
   useEffect(() => {
-    const config = getVenueConfig(event?.sport || event?.category);
+    // Получаем конфигурацию площадки на основе типа спорта из события
+    const sport = event?.sport || event?.category || 'футбол'; // По умолчанию используем футбол
+    const config = getVenueConfig(sport);
     setVenueConfig(config);
-    generateSeatingMap(config);
+
+    // Генерируем карту мест на основе конфигурации
+    if (config) {
+      generateSeatingMap(config);
+
+      // Добавляем случайные занятые места (примерно 30%)
+      setTimeout(() => {
+        setSeatingMap(prevMap => {
+          return prevMap.map(seat => {
+            if (seat.type === 'seat' && Math.random() < 0.3) {
+              return { ...seat, status: 'occupied' };
+            }
+            return seat;
+          });
+        });
+      }, 500);
+    }
   }, [event]);
 
   const generateSeatingMap = (config) => {
-    const map = [];
+    if (!config) return;
     
-    // Простая схема рядов мест по порядку
-    const totalRows = 15;
-    const seatsPerRow = 12;
+    const newSeatingMap = [];
+    const mapWidth = width - 40;
+    const mapHeight = height * 0.6;
+    const centerX = mapWidth / 2;
+    const centerY = mapHeight / 2;
     
-    for (let row = 1; row <= totalRows; row++) {
-      for (let seat = 1; seat <= seatsPerRow; seat++) {
-        // Расположение мест в прямоугольной сетке
-        const x = (seat - seatsPerRow / 2 - 0.5) * 2; // Отступы между местами
-        const y = (row - totalRows / 2 - 0.5) * 2; // Отступы между рядами
+    config.sections.forEach((section, sectionIndex) => {
+      const sectionSeats = [];
+      
+      // Определяем расположение и размер секции на основе её типа и конфигурации
+      let sectionLeft, sectionTop, sectionWidth, sectionHeight;
+      
+      if (config.type === 'octagon') {
+        // Октагон - секции располагаются по кругу, увеличиваясь
+        const sectionPadding = 50 + (sectionIndex * 45); // Увеличиваем расстояние между кольцами
+        sectionLeft = centerX - sectionPadding;
+        sectionTop = centerY - sectionPadding;
+        sectionWidth = sectionPadding * 2;
+        sectionHeight = sectionPadding * 2;
+      } else if (config.type === 'stadium') {
+        // Футбольный стадион - секции расположены по 4 сторонам
+        const fieldWidth = 180;
+        const fieldHeight = 120;
+        const seatSize = 15;
+        const rowHeight = 18;
         
-        // Определяем секцию по ряду
-        let section, color, price;
-        if (row <= 3) {
-          section = 'VIP';
-          color = '#FFD700';
-          price = 25000;
-        } else if (row <= 6) {
-          section = 'Premium';
-          color = '#FF6B35';
-          price = 18000;
-        } else if (row <= 10) {
-          section = 'Standard';
-          color = '#4ECDC4';
-          price = 12000;
-        } else {
-          section = 'Economy';
-          color = '#96CEB4';
-          price = 8000;
+        if (section.side === 'north') {
+          // Северная трибуна (верхняя)
+          sectionWidth = fieldWidth + 160;
+          sectionHeight = rowHeight * section.rows;
+          sectionLeft = centerX - sectionWidth / 2;
+          sectionTop = centerY - fieldHeight / 2 - sectionHeight - 10;
+        } else if (section.side === 'south') {
+          // Южная трибуна (нижняя)
+          sectionWidth = fieldWidth + 160;
+          sectionHeight = rowHeight * section.rows;
+          sectionLeft = centerX - sectionWidth / 2;
+          sectionTop = centerY + fieldHeight / 2 + 10;
+        } else if (section.side === 'east') {
+          // Восточная трибуна (правая)
+          sectionWidth = rowHeight * section.rows;
+          sectionHeight = fieldHeight + 80;
+          sectionLeft = centerX + fieldWidth / 2 + 10;
+          sectionTop = centerY - sectionHeight / 2;
+        } else { // west
+          // Западная трибуна (левая)
+          sectionWidth = rowHeight * section.rows;
+          sectionHeight = fieldHeight + 80;
+          sectionLeft = centerX - fieldWidth / 2 - sectionWidth - 10;
+          sectionTop = centerY - sectionHeight / 2;
         }
+      } else {
+        // Баскетбольная и другие арены - секции располагаются слоями
+        const sectionPadding = 15 + (sectionIndex * 30);
         
-        map.push({
-          id: `${section}-${row}-${seat}`,
-          section: section,
-          row,
-          seat,
-          x,
-          y,
-          price: price,
-          color: color,
-          status: Math.random() < 0.25 ? 'occupied' : 'available',
-        });
+        if (section.shape === 'rectangle') {
+          // Прямоугольные секции у краев поля
+          sectionLeft = sectionPadding;
+          sectionTop = mapHeight / 4 - 20;
+          sectionWidth = mapWidth - (sectionPadding * 2);
+          sectionHeight = 60;
+        } else if (section.shape === 'curve') {
+          // Закругленные секции по бокам
+          sectionLeft = sectionPadding;
+          sectionTop = mapHeight / 8 + (sectionIndex * 25);
+          sectionWidth = mapWidth - (sectionPadding * 2);
+          sectionHeight = 70 + (sectionIndex * 15);
+        } else if (section.shape === 'tier') {
+          // Ярусные секции
+          sectionLeft = sectionPadding;
+          sectionTop = 20 + (sectionIndex * 20);
+          sectionWidth = mapWidth - (sectionPadding * 2);
+          sectionHeight = mapHeight / 3 + (sectionIndex * 10);
+        } else {
+          // Круговые секции по умолчанию
+          sectionLeft = sectionPadding;
+          sectionTop = sectionPadding;
+          sectionWidth = mapWidth - (sectionPadding * 2);
+          sectionHeight = mapHeight / 2 - (sectionPadding * 1.5);
+        }
       }
-    }
+      
+      // Размещаем метку с названием секции
+      let labelLeft, labelTop;
+      
+      if (config.type === 'octagon') {
+        // Для октагона размещаем метки вверху каждой секции
+        const labelAngle = Math.PI / 4; // 45 градусов - примерное место для метки
+        const labelRadius = 85 + (sectionIndex * 45); // Радиус для метки
+        labelLeft = centerX + Math.cos(labelAngle) * labelRadius - 40;
+        labelTop = centerY + Math.sin(labelAngle) * labelRadius - 25;
+      } else if (config.type === 'stadium') {
+        if (section.side === 'north') {
+          labelLeft = sectionLeft + sectionWidth / 2 - 40;
+          labelTop = sectionTop - 25;
+        } else if (section.side === 'south') {
+          labelLeft = sectionLeft + sectionWidth / 2 - 40;
+          labelTop = sectionTop + sectionHeight + 5;
+        } else if (section.side === 'east') {
+          labelLeft = sectionLeft + sectionWidth + 5;
+          labelTop = sectionTop + sectionHeight / 2 - 15;
+        } else { // west
+          labelLeft = sectionLeft - 85;
+          labelTop = sectionTop + sectionHeight / 2 - 15;
+        }
+      } else {
+        if (section.shape === 'rectangle') {
+          labelLeft = mapWidth / 2 - 40;
+          labelTop = sectionTop - 25;
+        } else if (section.shape === 'curve') {
+          labelLeft = mapWidth / 2 - 40;
+          labelTop = sectionTop + sectionHeight + 5;
+        } else if (section.shape === 'tier') {
+          labelLeft = mapWidth / 2 - 40;
+          labelTop = sectionTop - 25;
+        } else {
+          labelLeft = mapWidth / 2 - 40;
+          labelTop = sectionTop - 15;
+        }
+      }
+      
+      // Добавляем информацию о секции
+      sectionSeats.push({
+        type: 'label',
+        id: `section-${sectionIndex}-label`,
+        left: labelLeft,
+        top: labelTop,
+        name: section.name,
+        price: section.basePrice,
+        color: section.color,
+      });
+      
+      // Генерируем места в зависимости от формы секции
+      for (let row = 0; row < section.rows; row++) {
+        for (let seat = 0; seat < section.seats; seat++) {
+          // Вычисляем позицию места
+          let seatX, seatY;
+          
+          if (config.type === 'octagon') {
+            // Для октагона размещаем места по восьмиугольнику вокруг центра
+            const angleStep = (Math.PI * 2) / section.seats;
+            const angle = angleStep * seat;
+            const radius = 85 + (sectionIndex * 45); // Радиус для колец мест с большими интервалами
+            
+            seatX = centerX + Math.cos(angle) * radius;
+            seatY = centerY + Math.sin(angle) * radius;
+          } else if (config.type === 'stadium') {
+            // Для футбольного стадиона в зависимости от стороны
+            const seatSpacing = 18; // расстояние между местами
+            const rowSpacing = 18; // расстояние между рядами
+            
+            if (section.side === 'north') {
+              // Северная трибуна (верхняя) - места идут слева направо
+              const sectionWidth = 180 + 160;
+              const seatsPerRow = section.seats;
+              const startX = centerX - sectionWidth / 2 + ((sectionWidth - (seatsPerRow * seatSpacing)) / 2);
+              
+              seatX = startX + (seat * seatSpacing);
+              seatY = sectionTop + (row * rowSpacing) + 10;
+            } else if (section.side === 'south') {
+              // Южная трибуна (нижняя) - места идут слева направо
+              const sectionWidth = 180 + 160;
+              const seatsPerRow = section.seats;
+              const startX = centerX - sectionWidth / 2 + ((sectionWidth - (seatsPerRow * seatSpacing)) / 2);
+              
+              seatX = startX + (seat * seatSpacing);
+              seatY = sectionTop + (row * rowSpacing) + 10;
+            } else if (section.side === 'east') {
+              // Восточная трибуна (правая) - места идут сверху вниз
+              const sectionHeight = 120 + 80;
+              const seatsPerRow = section.seats;
+              const startY = centerY - sectionHeight / 2 + ((sectionHeight - (seatsPerRow * seatSpacing)) / 2);
+              
+              seatX = sectionLeft + (row * rowSpacing) + 10;
+              seatY = startY + (seat * seatSpacing);
+            } else { // west
+              // Западная трибуна (левая) - места идут сверху вниз
+              const sectionHeight = 120 + 80;
+              const seatsPerRow = section.seats;
+              const startY = centerY - sectionHeight / 2 + ((sectionHeight - (seatsPerRow * seatSpacing)) / 2);
+              
+              seatX = sectionLeft + (row * rowSpacing) + 10;
+              seatY = startY + (seat * seatSpacing);
+            }
+          } else {
+            // Для других арен
+            if (section.shape === 'rectangle') {
+              seatX = sectionLeft + 10 + (seat * ((sectionWidth - 20) / section.seats));
+              seatY = sectionTop + 10 + (row * 15);
+            } else if (section.shape === 'curve') {
+              // Расположение по дуге
+              const angle = Math.PI - (Math.PI * (seat / section.seats));
+              const radius = sectionHeight - (row * 15);
+              seatX = mapWidth / 2 + Math.cos(angle) * radius;
+              seatY = mapHeight / 2 + Math.sin(angle) * (radius / 2) - (config.type === 'arena' ? 50 : 0);
+            } else if (section.shape === 'tier') {
+              // Расположение ярусами
+              seatX = sectionLeft + 10 + (seat * ((sectionWidth - 20) / section.seats));
+              seatY = sectionTop + sectionHeight - 20 - (row * 15);
+            } else {
+              // Круговое расположение
+              const angle = (Math.PI * 2 * (seat / section.seats));
+              const radius = sectionWidth / 3 + (row * 15);
+              seatX = mapWidth / 2 + Math.cos(angle) * radius;
+              seatY = mapHeight / 4 + Math.sin(angle) * radius;
+            }
+          }
+          
+          // Добавляем место с информацией о статусе
+          sectionSeats.push({
+            type: 'seat',
+            id: `${sectionIndex}-${row}-${seat}`,
+            left: seatX,
+            top: seatY,
+            row: row + 1,
+            seat: seat + 1,
+            section: section.name,
+            price: section.basePrice,
+            color: section.color,
+          });
+        }
+      }
+      
+      newSeatingMap.push(...sectionSeats);
+    });
     
-    setSeatingMap(map);
+    setSeatingMap(newSeatingMap);
   };
 
   const handleSeatPress = (seat) => {
+    // Проверяем, что это действительно место, а не метка
+    if (seat.type !== 'seat') return;
+    
     if (seat.status === 'occupied') {
       Alert.alert('Недоступно', 'Это место уже занято');
       return;
@@ -174,7 +379,7 @@ export default function SeatSelectionScreen({ navigation, route }) {
 
   const getTotalPrice = () => {
     return seatingMap
-      .filter(seat => selectedSeats.includes(seat.id))
+      .filter(seat => seat.type === 'seat' && selectedSeats.includes(seat.id))
       .reduce((total, seat) => total + seat.price, 0);
   };
 
@@ -212,10 +417,10 @@ export default function SeatSelectionScreen({ navigation, route }) {
 
     if (venueConfig.type === 'octagon') {
       Object.assign(centerStyle, {
-        width: 140,
-        height: 140,
-        marginLeft: -70,
-        marginTop: -70,
+        width: 120,
+        height: 120,
+        marginLeft: -60,
+        marginTop: -60,
         borderRadius: 25,
         transform: [{ rotate: '22.5deg' }],
       });
@@ -249,6 +454,8 @@ export default function SeatSelectionScreen({ navigation, route }) {
               <View style={styles.centerLine} />
               <View style={styles.penaltyArea1} />
               <View style={styles.penaltyArea2} />
+              <View style={styles.goalArea1} />
+              <View style={styles.goalArea2} />
               <Ionicons name={venueConfig.icon} size={32} color="white" style={styles.fieldIcon} />
               <Text style={styles.venueCenterText}>{venueConfig.name}</Text>
             </View>
@@ -269,43 +476,23 @@ export default function SeatSelectionScreen({ navigation, route }) {
     );
   };
 
-  const renderSectionLegend = () => {
-    const sections = [
-      { name: 'VIP', basePrice: 25000, color: '#FFD700' },
-      { name: 'Premium', basePrice: 18000, color: '#FF6B35' },
-      { name: 'Standard', basePrice: 12000, color: '#4ECDC4' },
-      { name: 'Economy', basePrice: 8000, color: '#96CEB4' },
-    ];
-
-    return (
-      <View style={styles.sectionLegend}>
-        {sections.map((section, index) => (
-          <View key={index} style={styles.legendItem}>
-            <View style={[styles.legendColor, { backgroundColor: section.color }]} />
-            <Text style={styles.legendText}>{section.name}</Text>
-            <Text style={styles.legendPrice}>{(section.basePrice / 1000)}k ₸</Text>
-          </View>
-        ))}
-      </View>
-    );
-  };
-
   const renderSeatingMap = () => {
     if (!seatingMap.length) return null;
 
     const mapWidth = width - 40;
-    const mapHeight = height * 0.6; // Увеличили высоту
-    const scale = 12; // Фиксированный масштаб
+    const mapHeight = height * 0.6;
 
     return (
       <View style={styles.mapContainer}>
         <ScrollView
           style={styles.mapScrollView}
           contentContainerStyle={{
-            width: mapWidth * 1.2,
-            height: mapHeight * 1.2,
+            width: mapWidth * 1.5,
+            height: mapHeight * 1.5,
             justifyContent: 'center',
             alignItems: 'center',
+            position: 'relative',
+            paddingBottom: 100,
           }}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
@@ -314,30 +501,53 @@ export default function SeatSelectionScreen({ navigation, route }) {
           maximumZoomScale={2.0}
           bouncesZoom={true}
           pinchGestureEnabled={true}
+          scrollEnabled={true}
+          nestedScrollEnabled={true}
         >
-          <View style={[styles.mapContent, { width: mapWidth, height: mapHeight }]}>
-            
-            {/* Сцена/Экран */}
-            <View style={styles.stage}>
-              <Text style={styles.stageText}>СЦЕНА / ЭКРАН</Text>
-            </View>
-            
-            {/* Места */}
-            {seatingMap.map((seat, index) => {
-              const seatX = (seat.x * scale) + mapWidth / 2;
-              const seatY = (seat.y * scale) + mapHeight / 2 + 40; // Смещение от сцены
+          <ScrollView
+            contentContainerStyle={{
+              width: mapWidth * 1.5,
+              height: mapHeight * 1.5,
+              justifyContent: 'center',
+              alignItems: 'center',
+              paddingBottom: 100,
+            }}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            scrollEnabled={true}
+            nestedScrollEnabled={true}
+          >
+            <View style={[
+              styles.mapContent, 
+              { 
+                width: mapWidth, 
+                height: mapHeight,
+                paddingTop: 30,
+              }
+            ]}>
               
-              return (
+              {/* Сцена/Экран */}
+              {venueConfig?.type !== 'octagon' && (
+                <View style={styles.stage}>
+                  <Text style={styles.stageText}>СЦЕНА / ЭКРАН</Text>
+                </View>
+              )}
+              
+              {/* Центр арены */}
+              {renderVenueCenter()}
+              
+              {/* Отображаем места без меток секций */}
+              {seatingMap.filter(item => item.type === 'seat').map((seat) => (
                 <TouchableOpacity
                   key={seat.id}
                   style={[
                     styles.seatButton,
                     {
-                      left: seatX - 12,
-                      top: seatY - 12,
+                      left: seat.left - 10,
+                      top: seat.top - 10 - 30,
                       backgroundColor: getSeatColor(seat),
                       borderColor: selectedSeats.includes(seat.id) ? '#FF6B6B' : 'rgba(255,255,255,0.5)',
-                      borderWidth: selectedSeats.includes(seat.id) ? 2.5 : 1,
+                      borderWidth: selectedSeats.includes(seat.id) ? 2 : 1,
                       transform: selectedSeats.includes(seat.id) ? [{ scale: 1.2 }] : [{ scale: 1 }],
                     }
                   ]}
@@ -348,24 +558,16 @@ export default function SeatSelectionScreen({ navigation, route }) {
                     styles.seatNumber,
                     {
                       color: seat.status === 'occupied' ? '#666' : 'white',
-                      fontSize: selectedSeats.includes(seat.id) ? 10 : 8,
+                      fontSize: selectedSeats.includes(seat.id) ? 9 : 8,
                       fontWeight: selectedSeats.includes(seat.id) ? 'bold' : '600'
                     }
                   ]}>
-                    {seat.seat}
+                    {seat.row}-{seat.seat}
                   </Text>
                 </TouchableOpacity>
-              );
-            })}
-            
-            {/* Подписи рядов */}
-            <View style={styles.rowLabels}>
-              <Text style={styles.rowLabelText}>Ряд 1-3: VIP</Text>
-              <Text style={styles.rowLabelText}>Ряд 4-6: Premium</Text>
-              <Text style={styles.rowLabelText}>Ряд 7-10: Standard</Text>
-              <Text style={styles.rowLabelText}>Ряд 11-15: Economy</Text>
+              ))}
             </View>
-          </View>
+          </ScrollView>
         </ScrollView>
       </View>
     );
@@ -390,12 +592,21 @@ export default function SeatSelectionScreen({ navigation, route }) {
             </Text>
           </View>
 
-          {renderSectionLegend()}
-
           <View style={styles.instructionContainer}>
             <Text style={styles.instructionText}>
               👆 Нажмите на места для выбора • 🔍 Используйте жесты для масштабирования
             </Text>
+            
+            {venueConfig && (
+              <View style={styles.sectionInfoContainer}>
+                {venueConfig.sections.map((section, index) => (
+                  <Text key={index} style={styles.sectionInfoText}>
+                    {section.name}: <Text style={{fontWeight: 'bold'}}>{section.basePrice.toLocaleString('ru-RU')} ₸</Text>
+                  </Text>
+                ))}
+              </View>
+            )}
+            
             {selectedSeats.length > 0 && (
               <Text style={styles.selectedHint}>
                 ✨ Выбрано: {selectedSeats.length} {selectedSeats.length === 1 ? 'место' : selectedSeats.length < 5 ? 'места' : 'мест'}
@@ -478,97 +689,104 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
   },
-  sectionLegend: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: 'white',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-    flexWrap: 'wrap',
-  },
-  legendItem: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    marginHorizontal: 4,
-    marginVertical: 4,
-  },
-  legendColor: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginBottom: 4,
-  },
-  legendText: {
-    fontSize: 9,
-    color: '#333',
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  legendPrice: {
-    fontSize: 8,
-    color: '#666',
-    fontWeight: '500',
-    textAlign: 'center',
-  },
   mapContainer: {
     flex: 1,
-    position: 'relative',
-    backgroundColor: '#f8f9fa',
-    marginTop: -80,
-    justifyContent: 'center',
-    alignItems: 'center',
+    marginHorizontal: 10,
+    marginVertical: 5,
+    marginBottom: 15,
+    borderRadius: 12,
+    overflow: 'hidden',
+    backgroundColor: 'white',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   mapScrollView: {
     flex: 1,
   },
   mapContent: {
     position: 'relative',
-    backgroundColor: 'transparent',
+    backgroundColor: 'rgba(245, 247, 250, 0.9)',
+  },
+  stage: {
+    position: 'absolute',
+    top: 10,
+    left: '25%',
+    width: '50%',
+    height: 30,
+    backgroundColor: '#667eea',
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  stageText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 12,
   },
   seatButton: {
     position: 'absolute',
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 3,
+    elevation: 4,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
     shadowRadius: 2,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.5)',
   },
   seatNumber: {
     color: 'white',
     fontSize: 8,
     fontWeight: '600',
     textAlign: 'center',
-    textShadowColor: 'rgba(0, 0, 0, 0.6)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 1,
   },
   instructionContainer: {
-    backgroundColor: 'white',
-    paddingHorizontal: 20,
-    paddingVertical: 6,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    backgroundColor: '#FFF',
+    padding: 15,
+    margin: 10,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   instructionText: {
     fontSize: 14,
-    color: '#666',
+    color: '#333',
     textAlign: 'center',
-    fontStyle: 'italic',
+  },
+  sectionInfoContainer: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#EEE',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+  },
+  sectionInfoText: {
+    fontSize: 12,
+    color: '#555',
+    marginHorizontal: 6,
+    marginVertical: 3,
   },
   selectedHint: {
     fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
+    color: '#667eea',
     fontWeight: 'bold',
-    marginTop: 4,
+    textAlign: 'center',
+    marginTop: 10,
   },
   bookingFooter: {
     backgroundColor: 'white',
@@ -626,6 +844,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 12,
+    borderRadius: 20,
   },
   venueCenterText: {
     color: 'white',
@@ -637,97 +856,88 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },
-  sectionLabel: {
-    position: 'absolute',
-    padding: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderRadius: 12,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    minWidth: 80,
-  },
-  sectionLabelText: {
-    color: '#333',
-    fontSize: 10,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  sectionPriceText: {
-    color: '#666',
-    fontSize: 9,
-    fontWeight: '500',
-    textAlign: 'center',
-    marginTop: 2,
-  },
   footballField: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
     backgroundColor: '#4CAF50', // Зеленый цвет поля
+    borderRadius: 8,
   },
   centerCircle: {
-    width: 25,
-    height: 25,
-    borderRadius: 12.5,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     borderWidth: 2,
     borderColor: 'white',
     backgroundColor: 'transparent',
     position: 'absolute',
-    top: '45%',
   },
   centerLine: {
     width: '100%',
     height: 2,
     backgroundColor: 'white',
     position: 'absolute',
-    top: '50%',
-    borderRadius: 1,
   },
   penaltyArea1: {
-    width: 30,
-    height: 20,
+    width: 60,
+    height: 35,
     borderWidth: 2,
     borderColor: 'white',
     backgroundColor: 'transparent',
     position: 'absolute',
-    top: '15%',
+    top: 10,
     borderRadius: 2,
   },
   penaltyArea2: {
-    width: 30,
-    height: 20,
+    width: 60,
+    height: 35,
     borderWidth: 2,
     borderColor: 'white',
     backgroundColor: 'transparent',
     position: 'absolute',
-    bottom: '15%',
+    bottom: 10,
+    borderRadius: 2,
+  },
+  goalArea1: {
+    width: 30,
+    height: 15,
+    borderWidth: 2,
+    borderColor: 'white',
+    backgroundColor: 'transparent',
+    position: 'absolute',
+    top: 20,
+    borderRadius: 2,
+  },
+  goalArea2: {
+    width: 30,
+    height: 15,
+    borderWidth: 2,
+    borderColor: 'white',
+    backgroundColor: 'transparent',
+    position: 'absolute',
+    bottom: 20,
     borderRadius: 2,
   },
   fieldIcon: {
     position: 'absolute',
-    bottom: 15,
   },
   octagonRing: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'relative',
+    width: '100%',
+    height: '100%',
+    borderRadius: 25,
+    transform: [{ rotate: '-22.5deg' }],
   },
   innerOctagon: {
-    width: 80,
-    height: 80,
-    borderRadius: 12,
-    borderWidth: 3,
-    borderColor: 'white',
-    backgroundColor: 'rgba(255,255,255,0.1)',
     position: 'absolute',
-    top: '25%',
+    width: '85%',
+    height: '85%',
+    borderWidth: 3,
+    borderColor: 'rgba(255,255,255,0.7)',
+    borderRadius: 15,
   },
   stadiumLabel: {
     position: 'absolute',
@@ -748,49 +958,5 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: 'bold',
     textAlign: 'center',
-  },
-  stage: {
-    position: 'absolute',
-    top: 20,
-    left: '50%',
-    marginLeft: -100,
-    width: 200,
-    height: 40,
-    backgroundColor: '#333',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 8,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-  },
-  stageText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: 'white',
-    textAlign: 'center',
-  },
-  rowLabels: {
-    position: 'absolute',
-    bottom: 20,
-    left: 20,
-    right: 20,
-    padding: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderRadius: 12,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-  },
-  rowLabelText: {
-    color: '#333',
-    fontSize: 12,
-    fontWeight: '600',
-    textAlign: 'center',
-    marginVertical: 2,
   },
 }); 

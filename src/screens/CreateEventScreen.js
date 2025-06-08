@@ -203,6 +203,11 @@ export default function CreateEventScreen({ navigation }) {
       return;
     }
 
+    // Проверка всех полей формы
+    if (!validateBasicInfo() || !validateSeatPricing()) {
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -210,8 +215,12 @@ export default function CreateEventScreen({ navigation }) {
       const minPrice = Math.min(...seatPricing.sections.map(section => Number(section.price)));
       const maxPrice = Math.max(...seatPricing.sections.map(section => Number(section.price)));
 
+      // Создаем уникальный ID для события
+      const eventId = `event-${Date.now().toString()}`;
+      
+      // Форматируем данные события
       const newEvent = {
-        id: Date.now().toString(),
+        id: eventId,
         ...formData,
         price: minPrice,
         originalPrice: maxPrice,
@@ -221,11 +230,15 @@ export default function CreateEventScreen({ navigation }) {
         rating: 0,
         reviews_count: 0,
         tags: [formData.category],
-        discount: 0,
+        discount: Math.floor((maxPrice - minPrice) / maxPrice * 100) || 0,
         seatPricing: seatPricing.sections,
+        venue: formData.venue || `${formData.location} Arena`,
       };
 
+      // Сохраняем новое событие
       EventStorage.addEvent(newEvent);
+      
+      // Показываем сообщение об успехе
       startSuccessAnimation();
       
       setTimeout(() => {
@@ -233,7 +246,8 @@ export default function CreateEventScreen({ navigation }) {
         navigation.goBack();
       }, 3000);
     } catch (error) {
-      Alert.alert('Ошибка', 'Не удалось создать мероприятие');
+      console.error('Ошибка при создании мероприятия:', error);
+      Alert.alert('Ошибка', 'Не удалось создать мероприятие. Пожалуйста, попробуйте еще раз.');
     } finally {
       setIsSubmitting(false);
     }
@@ -507,34 +521,16 @@ export default function CreateEventScreen({ navigation }) {
   const startSuccessAnimation = () => {
     setShowSuccessModal(true);
     
-    // Пульсирующая анимация чекмарка
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulseAnim, {
-          toValue: 1.2,
-          duration: 600,
-          useNativeDriver: true,
-        }),
-        Animated.timing(pulseAnim, {
-          toValue: 1,
-          duration: 600,
-          useNativeDriver: true,
-        })
-      ])
-    ).start();
-
-    // Основная анимация появления
-    Animated.parallel([
-      Animated.spring(successAnim, {
+    // Анимация успешного создания
+    Animated.sequence([
+      Animated.timing(successAnim, {
         toValue: 1,
-        tension: 100,
-        friction: 8,
+        duration: 600,
         useNativeDriver: true,
       }),
-      // Анимация конфетти
       Animated.timing(confettiAnim, {
         toValue: 1,
-        duration: 2000,
+        duration: 800,
         useNativeDriver: true,
       })
     ]).start();
@@ -544,61 +540,40 @@ export default function CreateEventScreen({ navigation }) {
     <Modal
       visible={showSuccessModal}
       transparent={true}
-      animationType="none"
+      animationType="fade"
     >
-      <View style={styles.successModalOverlay}>
-        <Animated.View style={[styles.successModalContent, {
-          opacity: successAnim,
-          transform: [{ scale: successAnim }]
-        }]}>
+      <View style={styles.modalContainer}>
+        <Animated.View 
+          style={[
+            styles.successModal,
+            { 
+              opacity: successAnim,
+              transform: [
+                { scale: successAnim.interpolate({
+                  inputRange: [0, 0.5, 1],
+                  outputRange: [0.5, 1.1, 1]
+                }) }
+              ]
+            }
+          ]}
+        >
           <LinearGradient
-            colors={['#4CAF50', '#66BB6A', '#81C784']}
-            style={styles.successGradient}
+            colors={['#6ee7b7', '#3b82f6']}
+            style={styles.successModalContent}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
           >
-            {/* Конфетти анимация */}
-            <Animated.View style={[styles.confettiContainer, {
+            <Animated.View style={{
               opacity: confettiAnim,
-              transform: [{ 
-                translateY: confettiAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [-100, 200],
-                })
-              }]
-            }]}>
-              {[...Array(20)].map((_, index) => (
-                <Animated.View
-                  key={index}
-                  style={[
-                    styles.confettiPiece,
-                    {
-                      left: Math.random() * (width - 40) + 20,
-                      backgroundColor: ['#FFD700', '#FF6B6B', '#4ECDC4', '#667eea'][Math.floor(Math.random() * 4)],
-                      transform: [
-                        { 
-                          rotate: confettiAnim.interpolate({
-                            inputRange: [0, 1],
-                            outputRange: ['0deg', `${360 * (index % 2 === 0 ? 1 : -1)}deg`],
-                          })
-                        }
-                      ]
-                    }
-                  ]}
-                />
-              ))}
+              transform: [{ scale: confettiAnim }]
+            }}>
+              <Ionicons name="checkmark-circle" size={80} color="white" />
             </Animated.View>
-
-            <Animated.View style={[styles.successContent, {
-              transform: [{ scale: pulseAnim }]
-            }]}>
-              <View style={styles.successIconContainer}>
-                <Ionicons name="checkmark-circle" size={80} color="white" />
-              </View>
-              
-              <Text style={styles.successTitle}>Мероприятие создано! 🎉</Text>
-              <Text style={styles.successSubtitle}>
-                Теперь оно доступно на главной странице
-              </Text>
-            </Animated.View>
+            
+            <Text style={styles.successTitle}>Событие создано!</Text>
+            <Text style={styles.successMessage}>
+              Ваше мероприятие "{formData.title}" успешно создано и опубликовано.
+            </Text>
           </LinearGradient>
         </Animated.View>
       </View>
@@ -607,22 +582,68 @@ export default function CreateEventScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#667eea" />
+      <StatusBar barStyle="light-content" />
       
       {renderHeader()}
       
       <ScrollView
         style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
         <View style={styles.formContainer}>
           {renderStepContent()}
-          {renderNavigationButtons()}
         </View>
-        
-        <View style={styles.bottomSpacing} />
       </ScrollView>
+      
+      <View style={styles.footer}>
+        <TouchableOpacity
+          style={styles.footerButton}
+          onPress={handlePrevStep}
+        >
+          <Ionicons name="chevron-back" size={24} color="#667eea" />
+          <Text style={styles.footerButtonText}>
+            {currentStep > STEPS.BASIC_INFO ? 'Назад' : 'Отмена'}
+          </Text>
+        </TouchableOpacity>
+        
+        {currentStep < STEPS.PREVIEW ? (
+          <TouchableOpacity
+            style={styles.footerButton}
+            onPress={handleNextStep}
+          >
+            <Text style={styles.footerButtonText}>Далее</Text>
+            <Ionicons name="chevron-forward" size={24} color="#667eea" />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={[styles.footerButton, styles.submitButton]}
+            onPress={handleSubmit}
+            disabled={isSubmitting}
+          >
+            <LinearGradient
+              colors={['#667eea', '#764ba2']}
+              style={styles.submitButtonGradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+              {isSubmitting ? (
+                <View style={styles.submitLoading}>
+                  <Animated.View style={{
+                    transform: [{ rotate: spin }]
+                  }}>
+                    <Ionicons name="refresh" size={24} color="white" />
+                  </Animated.View>
+                </View>
+              ) : (
+                <View style={styles.submitContent}>
+                  <Text style={styles.submitText}>Создать</Text>
+                  <Ionicons name="checkmark" size={24} color="white" />
+                </View>
+              )}
+            </LinearGradient>
+          </TouchableOpacity>
+        )}
+      </View>
       
       {renderSuccessModal()}
     </SafeAreaView>
@@ -873,63 +894,77 @@ const styles = StyleSheet.create({
     color: 'white',
     marginHorizontal: 8,
   },
-  bottomSpacing: {
-    height: 50,
-  },
-  successModalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    justifyContent: 'center',
-    alignItems: 'center',
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     padding: 20,
   },
-  successModalContent: {
+  footerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  footerButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#667eea',
+    marginLeft: 8,
+  },
+  submitButton: {
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  submitButtonGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+  },
+  submitLoading: {
+    padding: 16,
+  },
+  submitContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  submitText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'white',
+    marginRight: 8,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  successModal: {
     width: width * 0.85,
-    maxWidth: 400,
     borderRadius: 20,
     overflow: 'hidden',
     elevation: 10,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
+    shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.3,
-    shadowRadius: 20,
+    shadowRadius: 8,
   },
-  successGradient: {
+  successModalContent: {
     padding: 30,
     alignItems: 'center',
-  },
-  successIconContainer: {
-    alignItems: 'center',
-    marginBottom: 20,
   },
   successTitle: {
     fontSize: 24,
     fontWeight: 'bold',
     color: 'white',
-    marginBottom: 10,
+    marginTop: 16,
+    marginBottom: 8,
     textAlign: 'center',
   },
-  successSubtitle: {
+  successMessage: {
     fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.9)',
+    color: 'white',
     textAlign: 'center',
-    marginBottom: 20,
-  },
-  confettiContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 1,
-  },
-  confettiPiece: {
-    position: 'absolute',
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  successContent: {
-    alignItems: 'center',
+    lineHeight: 22,
   },
 }); 

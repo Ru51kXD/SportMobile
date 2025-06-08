@@ -165,30 +165,30 @@ const HomeScreen = ({ navigation }) => {
     <Animated.View style={[styles.searchContainer, { 
       opacity: searchAnimation,
       transform: [{ translateY: searchAnimation.interpolate({
-        inputRange: [0, 1],
+      inputRange: [0, 1],
         outputRange: [20, 0]
       })}]
     }]}>
       <View style={styles.searchBar}>
-        <Ionicons name="search" size={20} color="#667eea" />
-        <TextInput
-          style={styles.searchInput}
+          <Ionicons name="search" size={20} color="#667eea" />
+          <TextInput
+            style={styles.searchInput}
           placeholder="Поиск событий..."
           placeholderTextColor="#999"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
         {searchQuery ? (
           <TouchableOpacity
             onPress={() => setSearchQuery('')}
             style={styles.clearButton}
           >
             <Ionicons name="close-circle" size={20} color="#999" />
-          </TouchableOpacity>
+            </TouchableOpacity>
         ) : null}
       </View>
-    </Animated.View>
-  );
+      </Animated.View>
+    );
 
   const renderCategories = () => (
     <Animated.View style={[styles.categoriesContainer, { opacity: fadeAnim }]}>

@@ -492,13 +492,13 @@ const EventDetailsScreen = ({ route, navigation }) => {
         {/* Event Info */}
         <View style={styles.infoSection}>
           <View style={styles.infoRow}>
-            <View style={styles.infoItem}>
+          <View style={styles.infoItem}>
               <Ionicons name="calendar-outline" size={20} color="#667eea" />
               <Text style={styles.infoText}>
                 {formatDate(event.date)}
               </Text>
             </View>
-            <View style={styles.infoItem}>
+          <View style={styles.infoItem}>
               <Ionicons name="time-outline" size={20} color="#667eea" />
               <Text style={styles.infoText}>
                 {formatTime(event.time)}
@@ -507,7 +507,7 @@ const EventDetailsScreen = ({ route, navigation }) => {
           </View>
 
           <View style={styles.infoRow}>
-            <View style={styles.infoItem}>
+          <View style={styles.infoItem}>
               <Ionicons name="location-outline" size={20} color="#667eea" />
               <Text style={styles.infoText}>
                 {event.location}
@@ -523,12 +523,12 @@ const EventDetailsScreen = ({ route, navigation }) => {
         </View>
 
         {/* Description */}
-        <View style={styles.descriptionSection}>
-          <Text style={styles.sectionTitle}>Описание</Text>
+          <View style={styles.descriptionSection}>
+            <Text style={styles.sectionTitle}>Описание</Text>
           <Text style={styles.description}>
             {event.description}
           </Text>
-        </View>
+          </View>
 
         {/* Price */}
         <View style={styles.priceSection}>
@@ -557,7 +557,7 @@ const EventDetailsScreen = ({ route, navigation }) => {
               <Ionicons name="add-circle" size={24} color="#667eea" />
             </TouchableOpacity>
           </View>
-
+          
           {reviews.length > 0 ? (
             reviews.map((review, index) => (
               <View key={index} style={styles.reviewCard}>
@@ -596,13 +596,13 @@ const EventDetailsScreen = ({ route, navigation }) => {
           }]}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Бронирование</Text>
-              <TouchableOpacity
+            <TouchableOpacity
                 style={styles.closeButton}
                 onPress={() => setModalVisible(false)}
-              >
+            >
                 <Ionicons name="close" size={24} color="#667eea" />
-              </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
+        </View>
 
             <View style={styles.modalBody}>
               <Text style={styles.modalLabel}>Ваше имя</Text>
@@ -648,7 +648,7 @@ const EventDetailsScreen = ({ route, navigation }) => {
                 <Text style={styles.confirmText}>Подтвердить</Text>
               </LinearGradient>
             </TouchableOpacity>
-          </Animated.View>
+      </Animated.View>
         </View>
       </Modal>
 
@@ -670,13 +670,13 @@ const EventDetailsScreen = ({ route, navigation }) => {
               >
                 <Ionicons name="close" size={24} color="#667eea" />
               </TouchableOpacity>
-            </View>
-
+        </View>
+        
             <View style={styles.modalBody}>
               <Text style={styles.modalLabel}>Ваша оценка</Text>
               <View style={styles.ratingStars}>
                 {[1, 2, 3, 4, 5].map((star) => (
-                  <TouchableOpacity
+        <TouchableOpacity
                     key={star}
                     onPress={() => setRating(star)}
                   >
@@ -704,16 +704,16 @@ const EventDetailsScreen = ({ route, navigation }) => {
             <TouchableOpacity
               style={styles.confirmButton}
               onPress={handleReview}
-            >
-              <LinearGradient
+        >
+          <LinearGradient
                 colors={['#667eea', '#764ba2']}
                 style={styles.confirmGradient}
-              >
+          >
                 <Ionicons name="send" size={24} color="white" />
                 <Text style={styles.confirmText}>Отправить</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          </Animated.View>
+          </LinearGradient>
+        </TouchableOpacity>
+      </Animated.View>
         </View>
       </Modal>
 
